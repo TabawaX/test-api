@@ -1,7 +1,7 @@
 const CidrMatcher = require('cidr-matcher');
 
-const whitelist = ['192.168.1.0/24', '10.0.0.0/8', '158.178.243.123/32', '114.10.114.94/32']
-const matcher = new CidrMatcher(whitelist)
+const whitelist = ['192.168.1.0/24', '10.0.0.0/8', '158.178.243.123/32', '114.10.114.94/32'];
+const matcher = new CidrMatcher(whitelist);
 
 module.exports = (req, res) => {
   try {
@@ -30,4 +30,4 @@ module.exports = (req, res) => {
       message: 'Internal Server Error'
     });
   }
-}
+};
