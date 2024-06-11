@@ -1,17 +1,17 @@
-const express = require('express');
-const path = require('path');
-const app = express();
+const express = require('express')
+const path = require('path')
+const app = express()
 
-// Serve the root index.html with embedded style.css
+
+app.use(express.static(path.join(__dirname, '../public')))
+
 app.get("/", (req, res) => {
-  const indexFilePath = path.join(__dirname, '../public/index.html');
-  const cssFilePath = path.join(__dirname, '../public/style.css');
-  
-  res.sendFile(indexFilePath);
-});
+  const indexPath = path.join(__dirname, '../public/index.html')
+  res.sendFile(indexPath)
+})
 
-// Import and use the router for /api routes
-const router = require('./router');
-app.use('/api', router); // Add '/api' prefix
 
-module.exports = app;
+const router = require('./router')
+app.use('/api', router)
+
+module.exports = app
