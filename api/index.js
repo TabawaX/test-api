@@ -1,7 +1,7 @@
+__path = process.cwd();
 const express = require("express");
 const cors = require("cors");
 const secure = require("ssl-express-www");
-const path = require("path");
 
 const app = express();
 
