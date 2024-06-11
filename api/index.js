@@ -1,10 +1,10 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const router = express.Router();
+const app = express();
 
-// Index route
-router.get("/", async (req, res) => {
+// Serve the root index.html and style.css on the root path
+app.get("/", async (req, res) => {
   const indexFile = path.resolve(__dirname, '../public/index.html');
   const cssFile = path.resolve(__dirname, '../public/style.css');
 
@@ -26,11 +26,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-// IP route
-const ipRoute = require('./ip');
-router.get('/ip', ipRoute);
-
-const app = express();
+// Import and use the router for /api routes
+const router = require('./your-router-file'); // Adjust the path accordingly
 app.use('/api', router);
 
 module.exports = app;
