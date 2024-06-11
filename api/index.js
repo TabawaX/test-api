@@ -5,8 +5,8 @@ const app = express();
 
 // Serve the root index.html and style.css on the root path
 app.get("/", async (req, res) => {
-  const indexFile = path.resolve(__dirname, '../public/index.html');
-  const cssFile = path.resolve(__dirname, '../public/style.css');
+  const indexFile = path.join(__dirname, '../public/index.html');
+  const cssFile = path.join(__dirname, '../public/style.css');
 
   try {
     const [indexRAW, cssRAW] = await Promise.all([
@@ -27,7 +27,7 @@ app.get("/", async (req, res) => {
 });
 
 // Import and use the router for /api routes
-const router = require('./your-router-file'); // Adjust the path accordingly
+const router = require('./router');
 app.use('/api', router);
 
 module.exports = app;
