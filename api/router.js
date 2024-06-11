@@ -7,7 +7,7 @@ const router = express.Router();
 
 const __path = process.cwd();
 
-router.get("/api/status", async (req, res) => {
+router.get("/status", async (req, res) => { // Remove '/api' prefix
   const date = new Date();
   const jam = date.getHours();
   const menit = date.getMinutes();
