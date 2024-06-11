@@ -1,0 +1,248 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Sekai Docs</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.all.min.js"></script>
+    </head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Ubuntu, sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100%;
+            position: relative;
+        }
+        .text {
+            color: white;
+            text-align: center;
+        }
+        .status {
+            animation: animetop .8s;
+        }
+        .readdocs {
+            animation: animebot .8s;
+        }
+        @keyframes animetop {
+            0% {
+                top: -200px;
+                opacity: 0;
+            }
+            100% {
+                top: 0;
+                opacity: 1;
+            }
+        }
+        @keyframes animebot {
+            0% {
+                top: 200px;
+                opacity: 0;
+            }
+            100% {
+                top: 0;
+                opacity: 1;
+            }
+        }
+        p {
+            color: rgba(255, 255, 255, .8);
+            letter-spacing: .15em;
+            font-size: 15px!important;
+            font-weight: 600;
+        }
+        a {
+            text-decoration: none;
+            color: rgba(255, 255, 255, .5);
+        }
+        a.sosmed {
+            color: rgba(255, 255, 255, .8);
+        }
+        a:hover {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 1);
+        }
+        .typed-text {
+            color: #0f0;
+        }
+        .cursor {
+            overflow: hidden;
+            border-right: .15em solid orange;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .15em;
+            animation: typing 1.5s steps(40, end), blink-caret .75s step-end infinite;
+        }
+        @keyframes typing {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
+        }
+        @keyframes blink-caret {
+            from, to {
+                border-color: transparent;
+            }
+            50% {
+                border-color: orange;
+            }
+        }
+        hr {
+            margin: 10px auto;
+            position: relative;
+            background: rgba(255, 255, 255, .5);
+            width: 80%;
+            height: 2px;
+        }
+        .bottom {
+            position: fixed;
+            left: 50%;
+            bottom: 50px;
+            transform: translate(-50%, -50%);
+            margin: 0 auto;
+        }
+    </style>
+    <body>
+        <img id="myImage" class="background-image" src="https://mallucampaign.in/images/img_1718095052.jpg" alt="Image">
+        <div class="container">
+            <div class="text">
+                <div class="status">
+                    <p>STATUS : <span class="typed-text"></span><span class="cursor typing"></span></p>
+                </div>
+                <hr>
+                <div class="readdocs">
+                    <p>OPEN <a href="https://kislana.my.id/api/status" class="docs">DOCS.</a></p>
+                </div>
+            </div>
+            <div class="bottom">
+                <p>
+                    <a href="http://github.com/TabawaX" rel="noopener noreferrer" class="sosmed"><i class="mdi mdi-instagram"></i> Github</a>
+                </p>
+            </div>
+        </div>
+        <script>
+            var img = document.getElementById("myImage");
+
+            function showImage() {
+                img.style.display = 'block';
+            }
+
+          
+            
+
+            const typedTextSpan = document.querySelector(".typed-text"),
+                textArray = ["ACTIVE~", "ONLINE~"],
+                typingDelay = 200,
+                erasingDelay = 100,
+                newTextDelay = 2000;
+
+            let textArrayIndex = 0,
+                charIndex = 0;
+
+            function type() {
+                if (charIndex < textArray[textArrayIndex].length) {
+                    typedTextSpan.textContent += textArray[textArrayIndex].charAt(charIndex);
+                    charIndex++;
+                    setTimeout(type, typingDelay);
+                } else {
+                    setTimeout(erase, newTextDelay);
+                }
+            }
+
+            function erase() {
+                if (charIndex > 0) {
+                    typedTextSpan.textContent = textArray[textArrayIndex].substring(0, charIndex - 1);
+                    charIndex--;
+                    setTimeout(erase, erasingDelay);
+                } else {
+                    textArrayIndex++;
+                    if (textArrayIndex >= textArray.length) textArrayIndex = 0;
+                    setTimeout(type, typingDelay + 1100);
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                setTimeout(type, newTextDelay + 250);
+            });
+
+            $(document).ready(function() {
+                $(".changeprofile").submit(function(e) {
+                    var formObj, formURL = $(this).attr("action"),
+                        formData = new FormData(this);
+                    $.ajax({
+                        url: formURL,
+                        type: "POST",
+                        data: formData,
+                        contentType: false,
+                        cache: false,
+                        processData: false,
+                        beforeSend: function() {
+                            $("button").attr("disabled", "disabled");
+                            $("input").attr("disabled", "disabled");
+                            $("a").attr("disabled", "disabled");
+                            $(".inibutton").html('<i class="fas fa-spinner fa-spin"></i> Wait');
+                        },
+                        success: function(data) {
+                            if (data.includes("Success")) {
+                                $("button").removeAttr("disabled");
+                                $("a").removeAttr("disabled");
+                                $("input").removeAttr("disabled");
+                                $(".inibutton").html("Save");
+                                $.notify({
+                                    icon: "tim-icons icon-check-2",
+                                    message: data
+                                }, {
+                                    type: "success",
+                                    timer: 3000,
+                                    placement: {
+                                        from: "top",
+                                        align: "right"
+                                    }
+                                });
+                                window.location = window.location;
+                            } else {
+                                $("button").removeAttr("disabled");
+                                $("a").removeAttr("disabled");
+                                $("input").removeAttr("disabled");
+                                $(".inibutton").html("Save");
+                                $.notify({
+                                    icon: "tim-icons icon-simple-remove",
+                                    message: data
+                                }, {
+                                    type: "danger",
+                                    timer: 3000,
+                                    placement: {
+                                        from: "top",
+                                        align: "right"
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    e.preventDefault();
+                });
+            });
+        </script>
+    </body>
+</html>
