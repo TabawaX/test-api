@@ -4,16 +4,18 @@ const cors = require("cors");
 const secure = require("ssl-express-www");
 
 const app = express();
-const __path = process.cwd(); 
+const __path = process.cwd();
 
 app.enable("trust proxy");
 app.set("json spaces", 2);
 app.use(cors());
 app.use(secure);
-app.use(express.static((__path + "public"));
+
+// Serve static files from the "public" directory
+app.use(express.static(__path + "/public"));
 
 app.get("/", (req, res) => {
-  res.sendFile(__path + "/sekai-page/home.html"); 
+  res.sendFile(__path + "/sekai-page/home.html");
 });
 
 const router = require('./api/router');
