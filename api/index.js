@@ -1,29 +1,14 @@
 const express = require('express');
-const fs = require('fs');
 const path = require('path');
 const app = express();
 
-// Serve the root index.html and style.css on the root path
-app.get("/", async (req, res) => {
-  const indexFile = path.join(__dirname, '../public/index.html');
-  const cssFile = path.join(__dirname, '../public/style.css');
-
-  try {
-    const [indexRAW, cssRAW] = await Promise.all([
-      fs.promises.readFile(indexFile, 'utf8'),
-      fs.promises.readFile(cssFile, 'utf8')
-    ]);
-
-    console.log('Successfully read index.html and style.css');
-
-    let dataDiEdit = indexRAW.replace(/<head>/, `<head><style>${cssRAW}</style>`);
-
-    res.setHeader('Content-Type', 'text/html');
-    res.send(dataDiEdit);
-  } catch (err) {
-    console.error('Error processing files:', err);
-    res.status(500).send('Error processing files');
-  }
+// Serve the root index.html with embedded style.css
+app.get("/", (req, res) => {
+  const indexFilePath = path.join(__dirname, '../public/index.html');
+  const cssFilePath = path.join(__dirname, '../public/style.css');
+  
+  res.sendFile(indexFilePath);
+  res.sendFile(cssFilePath);
 });
 
 // Import and use the router for /api routes
