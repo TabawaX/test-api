@@ -8,9 +8,11 @@
     "build": "next build",
     "start": "next start"
   },
-"dependencies": {
-  "express": "^4.17.1",
-  "path": "^0.12.7",
-  "cidr-matcher": "^2.1.1"
-}
+  "dependencies": {
+    "express": "^4.17.1",
+    "path": "^0.12.7",
+    "cidr-matcher": "^2.1.1",
+    "node-fetch": "^2.6.1",
+    "axios": "^0.21.1"
+  }
 }
