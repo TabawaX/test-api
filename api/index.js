@@ -2,14 +2,13 @@ const express = require('express')
 const path = require('path')
 const app = express()
 
-
-app.use(express.static(path.join(__dirname, '../public')))
-
 app.get("/", (req, res) => {
-  const indexPath = path.join(__dirname, '../public/index.html')
-  res.sendFile(indexPath)
-})
+  const indexFilePath = path.join(__dirname, '../public/index.html')
+  const cssFilePath = path.join(__dirname, '../public/style.css')
 
+  res.sendFile(indexFilePath)
+  res.sendFile(cssFilePath)
+})
 
 const router = require('./router')
 app.use('/api', router)
