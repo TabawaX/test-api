@@ -1,0 +1,407 @@
+/* Style Settings */
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swa');
+:root {
+    --accentColor: #35363a;
+    --font: 'Ubuntu', sans-serif;
+    font-display: swap;
+}
+
+body {
+    margin: auto;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow: auto;
+    background: linear-gradient(315deg, rgba(101,0,94,1) 3%, rgba(60,132,206,1) 38%, rgba(48,238,226,1) 68%, rgba(255,25,25,1) 98%);
+    animation: gradient 15s ease infinite;
+    background-size: 400% 400%;
+    background-attachment: fixed;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+.wave {
+    background: rgb(255 255 255 / 25%);
+    border-radius: 1000% 1000% 0 0;
+    position: fixed;
+    width: 200%;
+    height: 12em;
+    animation: wave 10s -3s linear infinite;
+    transform: translate3d(0, 0, 0);
+    opacity: 0.8;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+}
+
+.wave:nth-of-type(2) {
+    bottom: -1.25em;
+    animation: wave 18s linear reverse infinite;
+    opacity: 0.8;
+}
+
+.wave:nth-of-type(3) {
+    bottom: -2.5em;
+    animation: wave 20s -1s reverse infinite;
+    opacity: 0.9;
+}
+
+@keyframes wave {
+    2% {
+        transform: translateX(1);
+    }
+
+    25% {
+        transform: translateX(-25%);
+    }
+
+    50% {
+        transform: translateX(-50%);
+    }
+
+    75% {
+        transform: translateX(-25%);
+    }
+
+    100% {
+        transform: translateX(1);
+    }
+}
+
+#userPhoto{
+  width: 100px;
+    height: 100px;
+    display: block;
+    margin: 8px auto 13px;
+    border-radius: 25%;
+    -webkit-box-shadow: 1px 0px 48px -11px rgba(0,0,0,0.22);
+    -moz-box-shadow: 1px 0px 48px -11px rgba(0,0,0,0.22);
+    box-shadow: 1px 0px 48px -11px rgba(0,0,0,0.22);
+}
+
+#userName{
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    display: block;
+    font-family: 'Product Sans';
+    width: 100%;
+    text-align: center;
+}
+
+
+.footer{
+    color: #fff;
+    transition: 0.5s;
+    font-size: 0.8rem;
+    font-weight: 50px;
+    line-height: 1.25;
+    display: block;
+    font-family:'Product Sans';
+    width: 105%;
+    text-align: center;
+    text-decoration: none;
+    margin-top: 50px;
+    margin-bottom: 65px;
+}
+
+.footer:hover{
+    color: rgb(255, 255, 255);
+    transition: 0.5s;
+}
+
+#links{
+    max-width: 580px;
+    width: auto;
+    display: block;
+    margin: 27px auto;
+}
+
+.link{
+    display: block;
+    background-color: rgba(255, 255, 255, 0.0 );
+    color: #fff;
+    font-family: 'Product Sans';
+    text-align: center;
+    margin-bottom: 8px;
+    padding: 17px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: bold;
+/* Style Settings */
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swa');
+:root {
+    --accentColor: #35363a;
+    --font: 'Ubuntu', sans-serif;
+    font-display: swap;
+}
+
+body {
+    margin: auto;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow: auto;
+    background: linear-gradient(315deg, rgba(101,0,94,1) 3%, rgba(60,132,206,1) 38%, rgba(48,238,226,1) 68%, rgba(255,25,25,1) 98%);
+    animation: gradient 15s ease infinite;
+    background-size: 400% 400%;
+    background-attachment: fixed;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+.wave {
+    background: rgb(255 255 255 / 25%);
+    border-radius: 1000% 1000% 0 0;
+    position: fixed;
+    width: 200%;
+    height: 12em;
+    animation: wave 10s -3s linear infinite;
+    transform: translate3d(0, 0, 0);
+    opacity: 0.8;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+}
+
+.wave:nth-of-type(2) {
+    bottom: -1.25em;
+    animation: wave 18s linear reverse infinite;
+    opacity: 0.8;
+}
+
+.wave:nth-of-type(3) {
+    bottom: -2.5em;
+    animation: wave 20s -1s reverse infinite;
+    opacity: 0.9;
+}
+
+@keyframes wave {
+    2% {
+        transform: translateX(1);
+    }
+
+    25% {
+        transform: translateX(-25%);
+    }
+
+    50% {
+        transform: translateX(-50%);
+    }
+
+    75% {
+        transform: translateX(-25%);
+    }
+
+    100% {
+        transform: translateX(1);
+    }
+}
+
+#userPhoto{
+  width: 100px;
+    height: 100px;
+    display: block;
+    margin: 8px auto 13px;
+    border-radius: 25%;
+    -webkit-box-shadow: 1px 0px 48px -11px rgba(0,0,0,0.22);
+    -moz-box-shadow: 1px 0px 48px -11px rgba(0,0,0,0.22);
+    box-shadow: 1px 0px 48px -11px rgba(0,0,0,0.22);
+}
+
+#userName{
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    display: block;
+    font-family: 'Product Sans';
+    width: 100%;
+    text-align: center;
+}
+
+
+.footer{
+    color: #fff;
+    transition: 0.5s;
+    font-size: 0.8rem;
+    font-weight: 50px;
+    line-height: 1.25;
+    display: block;
+    font-family:'Product Sans';
+    width: 105%;
+    text-align: center;
+    text-decoration: none;
+    margin-top: 50px;
+    margin-bottom: 65px;
+}
+
+.footer:hover{
+    color: rgb(255, 255, 255);
+    transition: 0.5s;
+}
+
+#links{
+    max-width: 580px;
+    width: auto;
+    display: block;
+    margin: 27px auto;
+}
+
+.link{
+    display: block;
+    background-color: rgba(255, 255, 255, 0.0 );
+    color: #fff;
+    font-family: 'Product Sans';
+    text-align: center;
+    margin-bottom: 8px;
+    padding: 17px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all .25s cubic-bezier(.08, .59, .29, .99);
+    border: #fff 2px;
+}
+
+.link:hover{
+    background-color: #fff;
+    color: #fff;
+    border: solid var(--color-main) 2px;
+}
+/* Colors for social links*/
+
+.hvr-grow {
+    -webkit-transform: perspective(10px) translateZ(0);
+    transform: perspective(1px) translateZ(0);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -webkit-transition-property: transform;
+    transition-property: transform;
+    padding-left: 1rem;
+    padding-bottom: 0.1rem;
+    padding: 1rem;
+    border: solid #fff 2px;
+    border-radius: 10px;
+  }
+  .hvr-grow:hover, .hvr-grow:focus, .hvr-grow:active {
+    -webkit-transform: scale(1.02);
+    transform: scale(1.02);
+    padding-left: 1.5rem;
+    padding-bottom: 1.5rem;
+    padding: 1rem;
+    border: solid #fff 2px;
+    border-radius: 10%;
+  }
+
+
+.custom-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9998;
+}
+
+.popup-content2 {
+    max-height: 95%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+}
+
+.custom-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 60px;
+    z-index: 9999;
+}
+
+#popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+￼Enter    transition: all .25s cubic-bezier(.08, .59, .29, .99);
+    border: #fff 2px;
+}
+
+.link:hover{
+    background-color: #fff;
+    color: #fff;
+    border: solid var(--color-main) 2px;
+}
+/* Colors for social links*/
+
+.hvr-grow {
+    -webkit-transform: perspective(10px) translateZ(0);
+    transform: perspective(1px) translateZ(0);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -webkit-transition-property: transform;
+    transition-property: transform;
+    padding-left: 1rem;
+    padding-bottom: 0.1rem;
+    padding: 1rem;
+    border: solid #fff 2px;
+    border-radius: 10px;
+  }
+  .hvr-grow:hover, .hvr-grow:focus, .hvr-grow:active {
+ebkit-transform: scale(1.02);
+    transform: scale(1.02);
+    padding-left: 1.5rem;
+    padding-bottom: 1.5rem;
+    padding: 1rem;
+    border: solid #fff 2px;
+    border-radius: 10%;
+  }
+
+
+.custom-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9998;
+}
+
+.popup-content2 {
+    max-height: 95%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
