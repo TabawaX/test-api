@@ -1,20 +1,13 @@
 {
-  "name": "kaslana",
-  "version": "1.0.0",
-  "description": "link tree with api",
-  "main": "index.js",
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
-  },
-  "dependencies": {
-    "express": "^4.17.1",
-    "path": "^0.12.7",
-    "cidr-matcher": "^2.1.1",
-    "node-fetch": "^2.6.1",
-    "axios": "^0.21.1",
-    "cors": "^2.8.5",
-    "ssl-express-www": "^3.0.7"
-  }
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "index.js" },
+    { "src": "/", "dest": "index.js" }
+  ]
 }
