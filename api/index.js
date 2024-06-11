@@ -1,16 +1,22 @@
-const express = require('express')
-const path = require('path')
-const app = express()
+const express = require("express");
+const cors = require("cors");
+const secure = require("ssl-express-www");
+const path = require("path");
+
+const app = express();
+
+app.enable("trust proxy");
+app.set("json spaces", 2);
+app.use(cors());
+app.use(secure);
+app.use(express.static("public"));
+
 
 app.get("/", (req, res) => {
-  const indexFilePath = path.join(__dirname, '../public/index.html')
-  const cssFilePath = path.join(__dirname, '../public/style.css')
+	res.sendFile(__path + "/sekai-page/home.html");
+});
 
-  res.sendFile(indexFilePath)
-  res.sendFile(cssFilePath)
-})
+const router = require('./router');
+app.use('/api', router);
 
-const router = require('./router')
-app.use('/api', router)
-
-module.exports = app
+module.exports = app;
