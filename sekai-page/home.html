@@ -241,6 +241,30 @@
         animation: none;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 0, 0, 0.4), 0 0 80px rgba(0, 0, 0, 0.4);
       }
+      .swal2-popup {
+      background-color: #000; /* Warna latar belakang */
+      color: #fff; /* Warna teks */
+      border: 2px solid #fff; /* Warna border */
+    }
+
+    .swal2-title {
+      font-size: 24px; /* Ukuran font judul */
+    }
+
+    .swal2-content {
+      font-size: 16px; /* Ukuran font konten */
+    }
+
+    .swal2-actions {
+      display: flex;
+      justify-content: center;
+    }
+
+    .swal2-actions a {
+      color: #fff; /* Warna link */
+      text-decoration: none; /* Hapus underline */
+      margin: 0 10px; /* Margin antar link */
+    }
     </style>
   </head>
   <body>
@@ -291,11 +315,24 @@
           </div>
         </div>
       </div>
-    </center>
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    </center> 
+  <!-- SweetAlert -->
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script>
+    // Function untuk menampilkan pemberitahuan pop-up
+    function showNotification() {
+      Swal.fire({
+        title: 'Selamat Datang Kak!!',
+        html: 'Untuk Informasi Bot Whatsapp Silahkan Kunjungi <a href="https://chat.whatsapp.com/CwhyfVBfbydANCTohrBtzk">Group Whatsapp</a> <br>Dan Jika Kamu Developer Cobain Rest API\'s Kami Yuk <a href="https://kislana.my.id/api/docs">Sekai Rest API\'s</a>.',
+        icon: 'info',
+        confirmButtonText: 'Siap Kak'
+      });
+    }
+
+    // Panggil fungsi untuk menampilkan pemberitahuan saat halaman dimuat
+    window.onload = function() {
+      showNotification();
+    };
+  </script>
   </body>
 </html>
