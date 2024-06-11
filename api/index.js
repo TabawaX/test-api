@@ -8,11 +8,10 @@ app.get("/", (req, res) => {
   const cssFilePath = path.join(__dirname, '../public/style.css');
   
   res.sendFile(indexFilePath);
-  res.sendFile(cssFilePath);
 });
 
 // Import and use the router for /api routes
 const router = require('./router');
-app.use('/api', router);
+app.use('/', router); // Remove '/api' prefix
 
 module.exports = app;
