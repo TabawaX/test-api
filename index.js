@@ -21,4 +21,9 @@ app.get("/", (req, res) => {
 const router = require('./api/router');
 app.use('/api', router);
 
+const PORT = 8000; 
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
 module.exports = app;
