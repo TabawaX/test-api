@@ -12,6 +12,6 @@ app.get("/", (req, res) => {
 
 // Import and use the router for /api routes
 const router = require('./router');
-app.use('/', router); // Remove '/api' prefix
+app.use('/api', router); // Add '/api' prefix
 
 module.exports = app;
