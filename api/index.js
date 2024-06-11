@@ -5,10 +5,8 @@ const app = express();
 // Serve the root index.html with embedded style.css
 app.get("/", (req, res) => {
   const indexFilePath = path.join(__dirname, '../public/index.html');
-  const cssFilePath = path.join(__dirname, '../public/style.css');
   
   res.sendFile(indexFilePath);
-  res.sendFile(cssFilePath);
 });
 
 // Import and use the router for /api routes
