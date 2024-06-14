@@ -50,37 +50,40 @@ class SnapTikClient {
   }
 
   async eval_script(script1) {
-    try {
-      const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
-      console.log('Evaluated script:', script2);
-      return new Promise((resolve, reject) => {
-        let html = '';
-        const [k, v] = ['keys', 'values'].map(x => Object[x]({
-          $: () => Object.defineProperty({
-            remove() {},
-            style: { display: '' }
-          }, 'innerHTML', { set: t => (html = t) }),
-          app: { showAlert: reject },
-          document: { getElementById: () => ({ src: '' }) },
-          fetch: a => {
-            console.log('Fetch called with:', a);
-            return resolve({ html, oembed_url: a }), { json: () => ({ thumbnail_url: '' }) };
-          },
-          gtag: () => 0,
-          Math: { round: () => 0 },
-          XMLHttpRequest: function() {
-            return { open() {}, send() {} }
-          },
-          window: { location: { hostname: 'snaptik.app' } }
-        }));
+  try {
+    const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
+    console.log('Evaluated script:', script2);
 
-        Function(...k, script2)(...v);
-      });
-    } catch (error) {
-      console.error('Error in eval_script:', error);
-      throw error;
-    }
+    // Adjusted logic to handle conditions and errors
+    return new Promise((resolve, reject) => {
+      let html = '';
+      const [k, v] = ['keys', 'values'].map(x => Object[x]({
+        $: () => Object.defineProperty({
+          remove() {},
+          style: { display: '' }
+        }, 'innerHTML', { set: t => (html = t) }),
+        app: { showAlert: (msg, type) => reject(new Error(msg)) }, // Reject with an error
+        document: { getElementById: () => ({ src: '' }) },
+        fetch: a => {
+          console.log('Fetch called with:', a);
+          return resolve({ html, oembed_url: a }), { json: () => ({ thumbnail_url: '' }) };
+        },
+        gtag: () => 0,
+        Math: { round: () => 0 },
+        XMLHttpRequest: function() {
+          return { open() {}, send() {} }
+        },
+        window: { location: { hostname: 'snaptik.app' } }
+      }));
+
+      // Execute the evaluated script
+      Function(...k, script2)(...v);
+    });
+  } catch (error) {
+    console.error('Error in eval_script:', error);
+    throw error; // Propagate the error further up the chain
   }
+}
 
   async get_hd_video(token) {
     try {
@@ -141,20 +144,19 @@ class SnapTikClient {
   }
 
   async process(url) {
-    try {
-      const script = await this.get_script(url);
-      const { html, oembed_url } = await this.eval_script(script);
-      const data = await this.parse_html(html);
+  try {
+    const script = await this.get_script(url);
+    const { html, oembed_url } = await this.eval_script(script);
+    const data = await this.parse_html(html);
 
-      return {
-        ...data,
-        url,
-        oembed_url
-      };
-    } catch (error) {
-      console.error('Error in process:', error);
-      throw error;
-    }
+    return {
+      ...data,
+      url,
+      oembed_url
+    };
+  } catch (error) {
+    console.error('Error in process:', error);
+    throw error; // Propagate the error further up the chain
   }
 }
 
@@ -188,6 +190,9 @@ router.get("/tiktokdl", async (req, res) => {
     res.header('Content-Type', 'application/json').send(prettyJson);
   } catch (error) {
     console.error('Error in /tiktokdl endpoint:', error);
+    if (error.message.includes('Url error')) {
+      return res.status(400).json({ error: 'URL error. Please check again' });
+    }
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
