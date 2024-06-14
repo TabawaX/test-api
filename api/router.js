@@ -1,11 +1,12 @@
 const express = require('express');
 const axios = require('axios');
-const fetch = require('node-fetch');
-const os = require('os');
-const CidrMatcher = require('cidr-matcher');
 const cheerio = require('cheerio');
 const FormData = require('form-data');
+const atob = require('atob');
+const { URL } = require('url');
+const CidrMatcher = require('cidr-matcher');
 
+const app = express();
 const router = express.Router();
 const whitelist = ['192.168.1.0/24', '10.0.0.0/8', '158.178.243.123/32', '114.10.114.94/32'];
 const matcher = new CidrMatcher(whitelist);
@@ -19,132 +20,130 @@ class SnapTikClient {
   }
 
   async get_token() {
-  try {
-    const { data } = await this.axios.get('/');
-    const $ = cheerio.load(data);
-    const token = $('input[name="token"]').val();
-    console.log('Token retrieved:', token);
-    return token;
-  } catch (error) {
-    console.error('Error in get_token:', error);
-    throw error;
+    try {
+      const { data } = await this.axios.get('/');
+      const $ = cheerio.load(data);
+      const token = $('input[name="token"]').val();
+      console.log('Token retrieved:', token);
+      return token;
+    } catch (error) {
+      console.error('Error in get_token:', error);
+      throw error;
+    }
   }
-}
 
   async get_script(url) {
-  try {
-    const form = new FormData();
-    const token = await this.get_token();
-    console.log('Token used:', token);
+    try {
+      const form = new FormData();
+      const token = await this.get_token();
+      console.log('Token used:', token);
 
-    form.append('token', token);
-    form.append('url', url);
+      form.append('token', token);
+      form.append('url', url);
 
-    const { data } = await this.axios.post('/abc2.php', form);
-    console.log('Script data received:', data);
-    return data;
-  } catch (error) {
-    console.error('Error in get_script:', error);
-    throw error;
+      const { data } = await this.axios.post('/abc2.php', form);
+      console.log('Script data received:', data);
+      return data;
+    } catch (error) {
+      console.error('Error in get_script:', error);
+      throw error;
+    }
   }
-}
 
-async eval_script(script1) {
-  try {
-    const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
-    console.log('Evaluated script:', script2);
+  async eval_script(script1) {
+    try {
+      const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
+      console.log('Evaluated script:', script2);
 
-    // Adjusted logic to handle conditions and errors
-    return new Promise((resolve, reject) => {
       let html = '';
       const [k, v] = ['keys', 'values'].map(x => Object[x]({
-        $: () => Object.defineProperty({
-          remove() {},
-          style: { display: '' }
-        }, 'innerHTML', { set: t => (html = t) }),
-        app: { showAlert: (msg, type) => reject(new Error(msg)) }, // Reject with an error
-        document: { getElementById: () => ({ src: '' }) },
-        fetch: a => {
-          console.log('Fetch called with:', a);
-          return resolve({ html, oembed_url: a }), { json: () => ({ thumbnail_url: '' }) };
-        },
-        gtag: () => 0,
-        Math: { round: () => Math.round(+new Date() / 1000) }, // Adjusted timestamp condition to current time 
-        XMLHttpRequest: function() {  // <-- Added comma here
-          return { open() {}, send() {} }
-        },
-        window: { location: { hostname: 'kislana.my.id' } } // Adjusted hostname condition to match your server
+        $: () => ({
+          ...Object.defineProperty({}, 'innerHTML', {
+            set: t => (html = t)
+          }),
+          app: { showAlert: (msg, type) => console.error(`App showAlert: ${msg}`) },
+          document: { getElementById: () => ({ src: '' }) },
+          fetch: async a => {
+            console.log('Fetch called with:', a);
+            return {
+              json: async () => ({ thumbnail_url: '' }),
+              text: async () => html
+            };
+          },
+          gtag: () => 0,
+          Math: { round: () => Math.round(+new Date() / 1000) },
+          XMLHttpRequest: function () {
+            return { open() { }, send() { } }
+          },
+          window: { location: { hostname: 'kislana.my.id' } }
+        })
       }));
 
-      // Execute the evaluated script
       Function(...k, script2)(...v);
-      
-      // Assuming no error was thrown, resolve with the expected data structure
-      resolve({ html, oembed_url: 'some_oembed_url_placeholder' });
-    });
-  } catch (error) {
-    console.error('Error in eval_script:', error);
-    throw error; // Propagate the error further up the chain
+      return { html, oembed_url: 'some_oembed_url_placeholder' };
+    } catch (error) {
+      console.error('Error in eval_script:', error);
+      throw error;
+    }
   }
-}
 
   async get_hd_video(token) {
-  try {
-    const { data } = await this.axios.get(`/getHdLink.php?token=${token}`);
-    console.log('HD Video data received:', data);
-    if (data.error) throw new Error(data.error);
-    return data.url;
-  } catch (error) {
-    console.error('Error in get_hd_video:', error);
-    throw error;
+    try {
+      const { data } = await this.axios.get(`/getHdLink.php?token=${encodeURIComponent(token)}`);
+      console.log('HD Video data received:', data);
+      if (!data.url) throw new Error('HD Video URL not found in response');
+      return data.url;
+    } catch (error) {
+      console.error('Error in get_hd_video:', error);
+      throw error;
+    }
   }
-}
 
   async parse_html(html) {
-  try {
-    const $ = cheerio.load(html);
-    const is_video = !$('div.render-wrapper').length;
+    try {
+      const $ = cheerio.load(html);
+      const is_video = !$('div.render-wrapper').length;
 
-    if (is_video) {
-      const hd_token = $('div.video-links > button[data-tokenhd]').data('tokenhd');
-      const hd_url = new URL(await this.get_hd_video(hd_token));
-      const token = hd_url.searchParams.get('token');
-      const { url } = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      if (is_video) {
+        const hd_token = $('div.video-links > button[data-tokenhd]').data('tokenhd');
+        const hd_url = new URL(await this.get_hd_video(hd_token));
+        const token = hd_url.searchParams.get('token');
+        const { url } = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
 
-      console.log('Video URL:', url);
+        console.log('Video URL:', url);
 
-      return {
-        Engineer: 'Tabawa',
-        type: 'video',
-        data: {
-          sources: [
-            url,
-            hd_url.href,
-            ...$('div.video-links > a:not(a[href="/"])').toArray()
-            .map(elem => $(elem).attr('href'))
-            .map(x => x.startsWith('/') ? this.config.baseURL + x : x)
-          ].map(url => new Resource(url))
-        }
-      };
-    } else {
-      return {
-        Engineer: 'Tabawa',
-        type: 'slideshow',
-        data: {
-          photos: $('div.columns > div.column > div.photo').toArray().map(elem => ({
+        return {
+          Engineer: 'Tabawa',
+          type: 'video',
+          data: {
             sources: [
-              $(elem).find('img[alt="Photo"]').attr('src'),
-              $(elem).find('a[data-event="download_albumPhoto_photo"]').attr('href')
+              url,
+              hd_url.href,
+              ...$('div.video-links > a:not(a[href="/"])').toArray()
+                .map(elem => $(elem).attr('href'))
+                .map(x => x.startsWith('/') ? this.axios.defaults.baseURL + x : x)
             ].map(url => new Resource(url))
-          }))
-        }
-      };
+          }
+        };
+      } else {
+        return {
+          Engineer: 'Tabawa',
+          type: 'slideshow',
+          data: {
+            photos: $('div.columns > div.column > div.photo').toArray().map(elem => ({
+              sources: [
+                $(elem).find('img[alt="Photo"]').attr('src'),
+                $(elem).find('a[data-event="download_albumPhoto_photo"]').attr('href')
+              ].map(url => new Resource(url))
+            }))
+          }
+        };
+      }
+    } catch (error) {
+      console.error('Error in parse_html:', error);
+      throw error;
     }
-  } catch (error) {
-    console.error('Error in parse_html:', error);
-    throw error;
   }
-}
 
   async process(url) {
     try {
@@ -159,8 +158,14 @@ async eval_script(script1) {
       };
     } catch (error) {
       console.error('Error in process:', error);
-      throw error; // Propagate the error further up the chain
+      throw error;
     }
+  }
+}
+
+class Resource {
+  constructor(url) {
+    this.url = url;
   }
 }
 
@@ -193,13 +198,21 @@ router.get("/tiktokdl", async (req, res) => {
     res.header('Content-Type', 'application/json').send(prettyJson);
   } catch (error) {
     console.error('Error in /tiktokdl endpoint:', error);
-    if (error.message.includes('Url error')) {
-      return res.status(400).json({ error: 'URL error. Please check again' });
+
+    let errorMessage = 'Internal Server Error';
+    let statusCode = 500;
+
+    if (error.message.includes('URL error')) {
+      errorMessage = 'URL error. Please check again';
+      statusCode = 400;
+    } else if (error.response && error.response.status) {
+      statusCode = error.response.status;
+      errorMessage = error.message || 'Request failed with status code ' + statusCode;
     }
-    res.status(500).json({ error: 'Internal Server Error' });
+
+    res.status(statusCode).json({ error: errorMessage });
   }
 });
-
 router.get("/ip", (req, res) => { 
   const ipPengunjung = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
