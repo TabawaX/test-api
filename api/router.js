@@ -18,26 +18,26 @@ const tikclient = new SnapTikClient()
 const apikeyAuth = ['tabawayoisaki', 'tabawahoshino']
 
 router.get("/tiktokdl", async (req, res) => {
-  const { tiktokdl: url, apikey } = req.query
+  const { tiktokdl: url, apikey } = req.query;
 
   if (!url) {
-    return res.status(400).json({ error: 'Enter Videos You Want download!' })
+    return res.status(400).json({ error: 'Enter Videos You Want download!' });
   }
 
   if (!apikey) {
-    return res.status(400).json({ error: 'Need Apikey Query' })
+    return res.status(400).json({ error: 'Need Apikey Query' });
   }
 
-
   if (!apikeyAuth.includes(apikey)) {
-    return res.status(403).json({ error: 'Not registered apikey, want a apikey? https://kislana.my.id' })
+    return res.status(403).json({ error: 'Not registered apikey, want a apikey? https://kislana.my.id' });
   }
 
   try {
-    const data = await tikclient.process(url)
-    res.json(data)
+    const data = await tikclient.process(url);
+    res.json(data);
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error in /tiktokdl endpoint:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 })
 
