@@ -1,3 +1,4 @@
+
 const axios = require('axios');
 const cheerio = require('cheerio');
 const FormData = require('form-data');
@@ -10,7 +11,7 @@ class Resource {
   download(config = {}) {
     return axios({
       url: this.url,
-      type: 'stream',
+      responseType: 'stream',
       ...config
     });
   }
@@ -18,19 +19,23 @@ class Resource {
 
 class SnapTikClient {
   constructor(config = {}) {
-    this.axios = axios.create(this.config = {
+    this.axios = axios.create({
       baseURL: 'https://dev.snaptik.app',
       ...config,
     });
   }
 
   async get_token() {
+    console.log('Fetching token...');
     const { data } = await this.axios({ url: '/' });
     const $ = cheerio.load(data);
-    return $('input[name="token"]').val();
+    const token = $('input[name="token"]').val();
+    console.log('Token fetched:', token);
+    return token;
   }
 
   async get_script(url) {
+    console.log('Fetching script...');
     const form = new FormData();
     const token = await this.get_token();
 
@@ -43,10 +48,12 @@ class SnapTikClient {
       data: form
     });
 
+    console.log('Script fetched.');
     return data;
   }
 
   async eval_script(script1) {
+    console.log('Evaluating script...');
     const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
     return new Promise((resolve, reject) => {
       let html = '';
@@ -73,19 +80,24 @@ class SnapTikClient {
   }
 
   async get_hd_video(token) {
+    console.log('Fetching HD video URL...');
     const { data: { error, url } } = await this.axios({
-      url: '/getHdLink.php?token=' + token
+      url: '/getHdLink.php',
+      params: { token }
     });
 
     if (error) throw new Error(error);
+    console.log('HD video URL fetched:', url);
     return url;
   }
 
   async parse_html(html) {
+    console.log('Parsing HTML...');
     const $ = cheerio.load(html);
     const is_video = !$('div.render-wrapper').length;
 
-    return is_video ? await (async () => {
+    if (is_video) {
+      console.log('Detected video content.');
       const hd_token = $('div.video-links > button[data-tokenhd]').data('tokenhd');
       const hd_url = new URL(await this.get_hd_video(hd_token));
       const token = hd_url.searchParams.get('token');
@@ -100,36 +112,41 @@ class SnapTikClient {
             hd_url.href,
             ...$('div.video-links > a:not(a[href="/"])').toArray()
             .map(elem => $(elem).attr('href'))
-            .map(x => x.startsWith('/') ? this.config.baseURL + x : x)
+            .map(x => x.startsWith('/') ? this.axios.defaults.baseURL + x : x)
           ].map(url => new Resource(url))
         }
       };
-    })() : { 
-      Engineer: 'Tabawa',
-      type: 'slideshow',
-      data: {
-        photos: $('div.columns > div.column > div.photo').toArray().map(elem => ({
-          sources: [
-            $(elem).find('img[alt="Photo"]').attr('src'),
-            $(elem).find('a[data-event="download_albumPhoto_photo"]').attr('href')
-          ].map(url => new Resource(url))
-        }))
-      }
-    };
+    } else {
+      console.log('Detected slideshow content.');
+      return { 
+        Engineer: 'Tabawa',
+        type: 'slideshow',
+        data: {
+          photos: $('div.columns > div.column > div.photo').toArray().map(elem => ({
+            sources: [
+              $(elem).find('img[alt="Photo"]').attr('src'),
+              $(elem).find('a[data-event="download_albumPhoto_photo"]').attr('href')
+            ].map(url => new Resource(url))
+          }))
+        }
+      };
+    }
   }
 
   async process(url) {
+    console.log('Processing URL:', url);
     const script = await this.get_script(url);
     const { html, oembed_url } = await this.eval_script(script);
 
     const res = {
       ...(await this.parse_html(html)),
-      url
+      url,
+      oembed_url
     };
 
-    res.data.oembed_url = oembed_url;
+    console.log('Processing complete.');
     return res;
   }
 }
 
-module.exports = SnapTikClient
+module.exports = SnapTikClient;
