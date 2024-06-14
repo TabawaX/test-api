@@ -49,12 +49,12 @@ class SnapTikClient {
     }
   }
 
-  async eval_script(script1) {
+async eval_script(script1) {
   try {
     const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
     console.log('Evaluated script:', script2);
 
-    // Adjusted logic to handle conditions and errors
+    // Handle conditions and errors
     return new Promise((resolve, reject) => {
       let html = '';
       const [k, v] = ['keys', 'values'].map(x => Object[x]({
@@ -73,7 +73,7 @@ class SnapTikClient {
         XMLHttpRequest: function() {
           return { open() {}, send() {} }
         },
-        window: { location: { hostname: 'snaptik.app' } } // Adjusted hostname condition
+        window: { location: { hostname: 'kislana.my.id' } } // Adjusted hostname condition
       }));
 
       // Execute the evaluated script
@@ -84,6 +84,7 @@ class SnapTikClient {
     throw error; // Propagate the error further up the chain
   }
 }
+
   async get_hd_video(token) {
     try {
       const { data } = await this.axios.get(`/getHdLink.php?token=${token}`);
