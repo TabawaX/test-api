@@ -120,6 +120,7 @@ class SnapTikClient {
 const apikeyAuth = ['tabawayoisaki', 'tabawahoshino'];
 const tikclient = new SnapTikClient();
 
+
 router.get("/tiktokdl", async (req, res) => {
   const { tiktokdl: url, apikey } = req.query;
 
@@ -136,14 +137,14 @@ router.get("/tiktokdl", async (req, res) => {
   }
 
   try {
-    const data = await client.process(url);
+    const data = await tikclient.process(url);
     const prettyJson = JSON.stringify(data, null, 2);
     res.header('Content-Type', 'application/json').send(prettyJson);
   } catch (error) {
     console.error('Error in /tiktokdl endpoint:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
-});
+})
 
 router.get("/ip", (req, res) => { 
   const ipPengunjung = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
