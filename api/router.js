@@ -75,9 +75,9 @@ class SnapTikClient {
             set: t => (html = t)
           })
         }),
-        app: { showAlert: (msg, type) => console.error(`App showAlert: ${msg}`) },
+        app: { showAlert: (msg) => console.error(`App showAlert: ${msg}`) },
         document: { getElementById: () => ({ src: '' }) },
-        fetch: async a => {
+        fetch: async (a) => {
           console.log('Fetch called with:', a);
           return {
             json: async () => ({ thumbnail_url: '' }),
@@ -94,6 +94,8 @@ class SnapTikClient {
 
       const scriptFunction = new Function(...Object.keys(context), script1);
       scriptFunction(...Object.values(context));
+
+      console.log('Evaluated HTML:', html);
 
       return { html, oembed_url: 'some_oembed_url_placeholder' };
     } catch (error) {
@@ -115,74 +117,74 @@ class SnapTikClient {
     }
   }
 
-async parse_html(html) {
+  async parse_html(html) {
     try {
-        console.log('Parsing HTML...');
-        const $ = cheerio.load(html);
-        const is_video = !$('div.render-wrapper').length;
-        console.log('Is video:', is_video);
+      console.log('Parsing HTML...');
+      const $ = cheerio.load(html);
+      const is_video = !$('div.render-wrapper').length;
+      console.log('Is video:', is_video);
 
-        if (is_video) {
-            // Try to find the HD token in different ways
-            let hd_token = $('div.video-links > button[data-tokenhd]').data('tokenhd');
-            console.log('HD Token (raw):', hd_token);
+      if (is_video) {
+        // Try to find the HD token in different ways
+        let hd_token = $('div.video-links > button[data-tokenhd]').data('tokenhd');
+        console.log('HD Token (raw):', hd_token);
 
-            if (!hd_token) {
-                hd_token = $('button[data-tokenhd]').attr('data-tokenhd');
-                console.log('HD Token (alternative):', hd_token);
-            }
-
-            if (!hd_token) {
-                // Logging the full HTML for debugging
-                console.error('HTML Response:', html);
-                throw new Error('HD Token not found in the HTML response');
-            }
-
-            console.log('HD Token:', hd_token);
-
-            const hd_url = new URL(await this.get_hd_video(hd_token));
-            const token = hd_url.searchParams.get('token');
-            console.log('Token from URL:', token);
-
-            const decodedToken = atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'));
-            console.log('Decoded Token:', decodedToken);
-
-            const { url } = JSON.parse(decodedToken);
-
-            console.log('Video URL:', url);
-
-            return {
-                Engineer: 'Tabawa',
-                type: 'video',
-                data: {
-                    sources: [
-                        url,
-                        hd_url.href,
-                        ...$('div.video-links > a:not(a[href="/"])').toArray()
-                            .map(elem => $(elem).attr('href'))
-                            .map(x => x.startsWith('/') ? this.axios.defaults.baseURL + x : x)
-                    ].map(url => new Resource(url))
-                }
-            };
-        } else {
-            return {
-                Engineer: 'Tabawa',
-                type: 'slideshow',
-                data: {
-                    photos: $('div.columns > div.column > div.photo').toArray().map(elem => ({
-                        sources: [
-                            $(elem).find('img[alt="Photo"]').attr('src'),
-                            $(elem).find('a[data-event="download_albumPhoto_photo"]').attr('href')
-                        ].map(url => new Resource(url))
-                    }))
-                }
-            };
+        if (!hd_token) {
+          hd_token = $('button[data-tokenhd]').attr('data-tokenhd');
+          console.log('HD Token (alternative):', hd_token);
         }
+
+        if (!hd_token) {
+          // Logging the full HTML for debugging
+          console.error('HTML Response:', html);
+          throw new Error('HD Token not found in the HTML response');
+        }
+
+        console.log('HD Token:', hd_token);
+
+        const hd_url = new URL(await this.get_hd_video(hd_token));
+        const token = hd_url.searchParams.get('token');
+        console.log('Token from URL:', token);
+
+        const decodedToken = atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'));
+        console.log('Decoded Token:', decodedToken);
+
+        const { url } = JSON.parse(decodedToken);
+
+        console.log('Video URL:', url);
+
+        return {
+          Engineer: 'Tabawa',
+          type: 'video',
+          data: {
+            sources: [
+              url,
+              hd_url.href,
+              ...$('div.video-links > a:not(a[href="/"])').toArray()
+                .map(elem => $(elem).attr('href'))
+                .map(x => x.startsWith('/') ? this.axios.defaults.baseURL + x : x)
+            ].map(url => new Resource(url))
+          }
+        };
+      } else {
+        return {
+          Engineer: 'Tabawa',
+          type: 'slideshow',
+          data: {
+            photos: $('div.columns > div.column > div.photo').toArray().map(elem => ({
+              sources: [
+                $(elem).find('img[alt="Photo"]').attr('src'),
+                $(elem).find('a[data-event="download_albumPhoto_photo"]').attr('href')
+              ].map(url => new Resource(url))
+            }))
+          }
+        };
+      }
     } catch (error) {
-        console.error('Error in parse_html:', error);
-        throw error;
+      console.error('Error in parse_html:', error);
+      throw error;
     }
-}
+  }
 
   async process(url) {
     try {
