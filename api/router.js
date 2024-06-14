@@ -230,8 +230,7 @@ router.get("/tiktokdl", async (req, res) => {
   try {
     console.log('Processing URL:', url);
 
-    const data = JSON.stringify(await client.process(url), null, 2)
-    console.log('Processed data:', data);
+    const data = await client.process(url)
 
     res.json(data)
   } catch (error) {
