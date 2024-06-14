@@ -50,42 +50,47 @@ class SnapTikClient {
     }
   }
 
-  async eval_script(script1) {
-    try {
-      const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
-      console.log('Evaluated script:', script2);
+async eval_script(script1) {
+  try {
+    const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
+    console.log('Evaluated script:', script2);
 
-      let html = '';
-      const [k, v] = ['keys', 'values'].map(x => Object[x]({
-        $: () => ({
-          ...Object.defineProperty({}, 'innerHTML', {
-            set: t => (html = t)
-          }),
-          app: { showAlert: (msg, type) => console.error(`App showAlert: ${msg}`) },
-          document: { getElementById: () => ({ src: '' }) },
-          fetch: async a => {
-            console.log('Fetch called with:', a);
-            return {
-              json: async () => ({ thumbnail_url: '' }),
-              text: async () => html
-            };
-          },
-          gtag: () => 0,
-          Math: { round: () => Math.round(+new Date() / 1000) },
-          XMLHttpRequest: function () {
-            return { open() { }, send() { } }
-          },
-          window: { location: { hostname: 'kislana.my.id' } }
-        })
-      }));
+    let html = '';
 
-      Function(...k, script2)(...v);
-      return { html, oembed_url: 'some_oembed_url_placeholder' };
-    } catch (error) {
-      console.error('Error in eval_script:', error);
-      throw error;
-    }
+    // Define a context object that provides necessary functions and objects
+    const context = {
+      $: () => ({
+        ...Object.defineProperty({}, 'innerHTML', {
+          set: t => (html = t)
+        }),
+        app: { showAlert: (msg, type) => console.error(`App showAlert: ${msg}`) },
+        document: { getElementById: () => ({ src: '' }) },
+        fetch: async a => {
+          console.log('Fetch called with:', a);
+          return {
+            json: async () => ({ thumbnail_url: '' }),
+            text: async () => html
+          };
+        },
+        gtag: () => 0,
+        Math: { round: () => Math.round(+new Date() / 1000) },
+        XMLHttpRequest: function () {
+          return { open() { }, send() { } }
+        }
+      }),
+      window: { location: { hostname: 'kislana.my.id' } }  // Simulate window.location
+    };
+
+    // Execute the script in the defined context
+    const scriptFunction = new Function(...Object.keys(context), script1);
+    scriptFunction(...Object.values(context));
+
+    return { html, oembed_url: 'some_oembed_url_placeholder' };
+  } catch (error) {
+    console.error('Error in eval_script:', error);
+    throw error;
   }
+}
 
   async get_hd_video(token) {
     try {
