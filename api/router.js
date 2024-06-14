@@ -59,14 +59,15 @@ router.get("/tiktokdl", async (req, res) => {
                 {
                     headers: {
                         'Accept': 'application/json, text/plain, */*',
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Cookie': '%5B%5B%22AKsRol968laQAHpzXggoXAlfTapcuDUSK799dVpD3KXwyCiLcqOaZ4d4pItRbzAl4mFZjbrFCrZkkdY82XmyQcCcA3c8RoIC_egHBMrPR4d3jiu6PNNtpOhYte6tvhxDT7ycMU7fy0WUT-pb2uwOAscLwke3vc44Zg%3D%3D%22%5D%5D' // Masukkan cookie Anda di sini
                     }
                 }
             );
 
             const html = response.data;
             const $ = cheerio.load(html);
-             
+
             const engineering = "Tabawa";
             const uniqueId = $('h2.font-extrabold.text-xl.text-center').text();
             const urls = $('a[title="zuo888z"]').attr('href');
