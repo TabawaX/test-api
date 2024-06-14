@@ -31,14 +31,14 @@ router.get("/tiktokdl", async (req, res) => {
   }
 
   try {
-    const data = await tikclient.process(url);
-    const responseData = JSON.stringify(data);
-    res.json(responseData);
+    console.log('Received TikTok URL:', url); // Log the TikTok URL
+
+    res.json({ url }); // Temporarily respond with the received URL
   } catch (error) {
     console.error('Error in /tiktokdl endpoint:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: error.message });
   }
-})
+});
 
 router.get("/status", async (req, res) => { 
   try {
