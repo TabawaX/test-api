@@ -69,8 +69,8 @@ async eval_script(script1) {
           return resolve({ html, oembed_url: a }), { json: () => ({ thumbnail_url: '' }) };
         },
         gtag: () => 0,
-        Math: { round: () => Math.round(+new Date() / 1000) } // Adjusted timestamp condition to current time 
-        XMLHttpRequest: function() {
+        Math: { round: () => Math.round(+new Date() / 1000) }, // Adjusted timestamp condition to current time 
+        XMLHttpRequest: function() {  // <-- Added comma here
           return { open() {}, send() {} }
         },
         window: { location: { hostname: 'kislana.my.id' } } // Adjusted hostname condition to match your server
@@ -87,6 +87,7 @@ async eval_script(script1) {
     throw error; // Propagate the error further up the chain
   }
 }
+
   async get_hd_video(token) {
     try {
       const { data } = await this.axios.get(`/getHdLink.php?token=${token}`);
