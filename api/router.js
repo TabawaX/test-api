@@ -154,22 +154,6 @@ class SnapTikClient {
 const apikeyAuth = ['tabawayoisaki', 'tabawahoshino'];
 const tikclient = new SnapTikClient();
 
-// Middleware
-router.use((req, res, next) => {
-  const ipPengunjung = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-
-  if (matcher.contains(ipPengunjung)) {
-    next();
-  } else {
-    res.status(403).json({
-      status: "403",
-      developer: "@Renkie",
-      ip: ipPengunjung,
-      message: 'Not authorized'
-    });
-  }
-});
-
 // Routes
 router.get("/tiktokdl", async (req, res) => {
   const { tiktokdl: url, apikey } = req.query;
@@ -189,7 +173,7 @@ router.get("/tiktokdl", async (req, res) => {
   try {
     console.log('Processing URL:', url);
 
-    const data = await tikclient.process(url);
+    const data = await tikclient.process(url); // Ensure `tikclient` is correctly instantiated
     const prettyJson = JSON.stringify(data, null, 2);
 
     console.log('Processed data:', data);
