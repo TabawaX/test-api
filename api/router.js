@@ -50,11 +50,9 @@ class SnapTikClient {
     }
   }
 
+
 async eval_script(script1) {
   try {
-    const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
-    console.log('Evaluated script:', script2);
-
     let html = '';
 
     // Define a context object that provides necessary functions and objects
@@ -62,22 +60,22 @@ async eval_script(script1) {
       $: () => ({
         ...Object.defineProperty({}, 'innerHTML', {
           set: t => (html = t)
-        }),
-        app: { showAlert: (msg, type) => console.error(`App showAlert: ${msg}`) },
-        document: { getElementById: () => ({ src: '' }) },
-        fetch: async a => {
-          console.log('Fetch called with:', a);
-          return {
-            json: async () => ({ thumbnail_url: '' }),
-            text: async () => html
-          };
-        },
-        gtag: () => 0,
-        Math: { round: () => Math.round(+new Date() / 1000) },
-        XMLHttpRequest: function () {
-          return { open() { }, send() { } }
-        }
+        })
       }),
+      app: { showAlert: (msg, type) => console.error(`App showAlert: ${msg}`) },
+      document: { getElementById: () => ({ src: '' }) },
+      fetch: async a => {
+        console.log('Fetch called with:', a);
+        return {
+          json: async () => ({ thumbnail_url: '' }),
+          text: async () => html
+        };
+      },
+      gtag: () => 0,
+      Math: { round: () => Math.round(+new Date() / 1000) },
+      XMLHttpRequest: function () {
+        return { open() { }, send() { } }
+      },
       window: { location: { hostname: 'snaptik.app' } }  // Simulate window.location
     };
 
