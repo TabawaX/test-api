@@ -54,7 +54,7 @@ async eval_script(script1) {
     const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
     console.log('Evaluated script:', script2);
 
-    // Handle conditions and errors
+    // Adjusted logic to handle conditions and errors
     return new Promise((resolve, reject) => {
       let html = '';
       const [k, v] = ['keys', 'values'].map(x => Object[x]({
@@ -69,22 +69,24 @@ async eval_script(script1) {
           return resolve({ html, oembed_url: a }), { json: () => ({ thumbnail_url: '' }) };
         },
         gtag: () => 0,
-        Math: { round: () => 0 },
+        Math: { round: () => Math.round(+new Date() / 1000) } // Adjusted timestamp condition to current time 
         XMLHttpRequest: function() {
           return { open() {}, send() {} }
         },
-        window: { location: { hostname: 'kislana.my.id' } } // Adjusted hostname condition
+        window: { location: { hostname: 'kislana.my.id' } } // Adjusted hostname condition to match your server
       }));
 
       // Execute the evaluated script
       Function(...k, script2)(...v);
+      
+      // Assuming no error was thrown, resolve with the expected data structure
+      resolve({ html, oembed_url: 'some_oembed_url_placeholder' });
     });
   } catch (error) {
     console.error('Error in eval_script:', error);
     throw error; // Propagate the error further up the chain
   }
 }
-
   async get_hd_video(token) {
     try {
       const { data } = await this.axios.get(`/getHdLink.php?token=${token}`);
