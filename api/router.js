@@ -19,101 +19,142 @@ class SnapTikClient {
   }
 
   async get_token() {
-    const { data } = await this.axios.get('/');
-    const $ = cheerio.load(data);
-    return $('input[name="token"]').val();
+    try {
+      const { data } = await this.axios.get('/');
+      const $ = cheerio.load(data);
+      const token = $('input[name="token"]').val();
+      console.log('Token retrieved:', token);
+      return token;
+    } catch (error) {
+      console.error('Error in get_token:', error);
+      throw error;
+    }
   }
 
   async get_script(url) {
-    const form = new FormData();
-    const token = await this.get_token();
+    try {
+      const form = new FormData();
+      const token = await this.get_token();
+      console.log('Token used:', token);
 
-    form.append('token', token);
-    form.append('url', url);
+      form.append('token', token);
+      form.append('url', url);
 
-    const { data } = await this.axios.post('/abc2.php', form);
-    return data;
+      const { data } = await this.axios.post('/abc2.php', form);
+      console.log('Script data received:', data);
+      return data;
+    } catch (error) {
+      console.error('Error in get_script:', error);
+      throw error;
+    }
   }
 
   async eval_script(script1) {
-    const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
-    return new Promise((resolve, reject) => {
-      let html = '';
-      const [k, v] = ['keys', 'values'].map(x => Object[x]({
-        $: () => Object.defineProperty({
-          remove() {},
-          style: { display: '' }
-        }, 'innerHTML', { set: t => (html = t) }),
-        app: { showAlert: reject },
-        document: { getElementById: () => ({ src: '' }) },
-        fetch: a => {
-          return resolve({ html, oembed_url: a }), { json: () => ({ thumbnail_url: '' }) };
-        },
-        gtag: () => 0,
-        Math: { round: () => 0 },
-        XMLHttpRequest: function() {
-          return { open() {}, send() {} }
-        },
-        window: { location: { hostname: 'snaptik.app' } }
-      }));
+    try {
+      const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
+      console.log('Evaluated script:', script2);
+      return new Promise((resolve, reject) => {
+        let html = '';
+        const [k, v] = ['keys', 'values'].map(x => Object[x]({
+          $: () => Object.defineProperty({
+            remove() {},
+            style: { display: '' }
+          }, 'innerHTML', { set: t => (html = t) }),
+          app: { showAlert: reject },
+          document: { getElementById: () => ({ src: '' }) },
+          fetch: a => {
+            console.log('Fetch called with:', a);
+            return resolve({ html, oembed_url: a }), { json: () => ({ thumbnail_url: '' }) };
+          },
+          gtag: () => 0,
+          Math: { round: () => 0 },
+          XMLHttpRequest: function() {
+            return { open() {}, send() {} }
+          },
+          window: { location: { hostname: 'snaptik.app' } }
+        }));
 
-      Function(...k, script2)(...v);
-    })
+        Function(...k, script2)(...v);
+      });
+    } catch (error) {
+      console.error('Error in eval_script:', error);
+      throw error;
+    }
   }
 
   async get_hd_video(token) {
-    const { data } = await this.axios.get(`/getHdLink.php?token=${token}`);
-    if (data.error) throw new Error(data.error);
-    return data.url;
+    try {
+      const { data } = await this.axios.get(`/getHdLink.php?token=${token}`);
+      console.log('HD Video data received:', data);
+      if (data.error) throw new Error(data.error);
+      return data.url;
+    } catch (error) {
+      console.error('Error in get_hd_video:', error);
+      throw error;
+    }
   }
 
   async parse_html(html) {
-    const $ = cheerio.load(html);
-    const is_video = !$('div.render-wrapper').length;
+    try {
+      const $ = cheerio.load(html);
+      const is_video = !$('div.render-wrapper').length;
 
-    return is_video ? await (async () => {
-      const hd_token = $('div.video-links > button[data-tokenhd]').data('tokenhd');
-      const hd_url = new URL(await this.get_hd_video(hd_token));
-      const token = hd_url.searchParams.get('token');
-      const { url } = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      if (is_video) {
+        const hd_token = $('div.video-links > button[data-tokenhd]').data('tokenhd');
+        const hd_url = new URL(await this.get_hd_video(hd_token));
+        const token = hd_url.searchParams.get('token');
+        const { url } = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
 
-      return { 
-        Engineer: 'Tabawa',
-        type: 'video',
-        data: {
-          sources: [
-            url,
-            hd_url.href,
-            ...$('div.video-links > a:not(a[href="/"])').toArray()
-            .map(elem => $(elem).attr('href'))
-            .map(x => x.startsWith('/') ? this.config.baseURL + x : x)
-          ].map(url => new Resource(url))
-        }
-      };
-    })() : { 
-      Engineer: 'Tabawa',
-      type: 'slideshow',
-      data: {
-        photos: $('div.columns > div.column > div.photo').toArray().map(elem => ({
-          sources: [
-            $(elem).find('img[alt="Photo"]').attr('src'),
-            $(elem).find('a[data-event="download_albumPhoto_photo"]').attr('href')
-          ].map(url => new Resource(url))
-        }))
+        console.log('Video URL:', url);
+        
+        return { 
+          Engineer: 'Tabawa',
+          type: 'video',
+          data: {
+            sources: [
+              url,
+              hd_url.href,
+              ...$('div.video-links > a:not(a[href="/"])').toArray()
+              .map(elem => $(elem).attr('href'))
+              .map(x => x.startsWith('/') ? this.config.baseURL + x : x)
+            ].map(url => new Resource(url))
+          }
+        };
+      } else {
+        return { 
+          Engineer: 'Tabawa',
+          type: 'slideshow',
+          data: {
+            photos: $('div.columns > div.column > div.photo').toArray().map(elem => ({
+              sources: [
+                $(elem).find('img[alt="Photo"]').attr('src'),
+                $(elem).find('a[data-event="download_albumPhoto_photo"]').attr('href')
+              ].map(url => new Resource(url))
+            }))
+          }
+        };
       }
-    };
+    } catch (error) {
+      console.error('Error in parse_html:', error);
+      throw error;
+    }
   }
 
   async process(url) {
-    const script = await this.get_script(url);
-    const { html, oembed_url } = await this.eval_script(script);
-    const data = await this.parse_html(html);
+    try {
+      const script = await this.get_script(url);
+      const { html, oembed_url } = await this.eval_script(script);
+      const data = await this.parse_html(html);
 
-    return {
-      ...data,
-      url,
-      oembed_url
-    };
+      return {
+        ...data,
+        url,
+        oembed_url
+      };
+    } catch (error) {
+      console.error('Error in process:', error);
+      throw error;
+    }
   }
 }
 
@@ -137,14 +178,19 @@ router.get("/tiktokdl", async (req, res) => {
   }
 
   try {
+    console.log('Processing URL:', url);
+
     const data = await tikclient.process(url);
     const prettyJson = JSON.stringify(data, null, 2);
+
+    console.log('Processed data:', data);
+
     res.header('Content-Type', 'application/json').send(prettyJson);
   } catch (error) {
     console.error('Error in /tiktokdl endpoint:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
-})
+});
 
 router.get("/ip", (req, res) => { 
   const ipPengunjung = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
