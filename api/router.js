@@ -2,14 +2,29 @@ const express = require('express');
 const axios = require('axios');
 const cheerio = require('cheerio');
 const FormData = require('form-data');
-const atob = require('atob');
-const { URL } = require('url');
 const CidrMatcher = require('cidr-matcher');
+const os = require('os');
 
-const app = express();
 const router = express.Router();
+const app = express();
 const whitelist = ['192.168.1.0/24', '10.0.0.0/8', '158.178.243.123/32', '114.10.114.94/32'];
 const matcher = new CidrMatcher(whitelist);
+
+// Classes
+class Resource {
+  constructor(url, index) {
+    this.index = index;
+    this.url = url;
+  }
+
+  download(config = {}) {
+    return axios({
+      url: this.url,
+      type: 'stream',
+      ...config
+    });
+  }
+}
 
 class SnapTikClient {
   constructor(config = {}) {
@@ -20,199 +35,142 @@ class SnapTikClient {
   }
 
   async get_token() {
-    try {
-      const { data } = await this.axios.get('/');
-      const $ = cheerio.load(data);
-      const token = $('input[name="token"]').val();
-      if (!token) throw new Error('Token not found in the HTML response');
-      console.log('Token retrieved:', token);
-      return token;
-    } catch (error) {
-      console.error('Error in get_token:', error);
-      throw error;
-    }
+    const { data } = await this.axios({
+      url: '/'
+    });
+    const $ = cheerio.load(data);
+    return $('input[name="token"]').val();
   }
 
   async get_script(url) {
-    try {
-      const form = new FormData();
-      const token = await this.get_token();
-      if (!token) throw new Error('Token is undefined or null');
-      console.log('Token used:', token);
+    const form = new FormData();
+    const token = await this.get_token();
 
-      form.append('token', token);
-      form.append('url', url);
+    form.append('token', token);
+    form.append('url', url);
 
-      const { data } = await this.axios.post('/abc2.php', form);
-      console.log('Script data received:', data);
-      return data;
-    } catch (error) {
-      console.error('Error in get_script:', error);
-      throw error;
-    }
+    const { data } = await this.axios({
+      url: '/abc2.php',
+      method: 'POST',
+      data: form
+    });
+
+    return data;
   }
 
   async eval_script(script1) {
-    try {
+    const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
+    return new Promise((resolve, reject) => {
       let html = '';
-
-      const mathProxy = new Proxy(Math, {
-        get(target, prop) {
-          if (prop in target) {
-            return target[prop];
-          } else {
-            console.warn(`Attempted to access undefined Math property: ${prop}`);
-            return () => {
-              throw new Error(`Math.${prop} is not a function`);
-            };
-          }
-        }
-      });
-
-      const context = {
-        $: () => ({
-          ...Object.defineProperty({}, 'innerHTML', {
-            set: t => (html = t)
-          })
+      const [k, v] = ['keys', 'values'].map(x => Object[x]({
+        $: () => Object.defineProperty({
+          remove() {},
+          style: { display: '' }
+        }, 'innerHTML', {
+          set: t => (html = t)
         }),
-        app: { showAlert: (msg) => console.error(`App showAlert: ${msg}`) },
+        app: { showAlert: reject },
         document: { getElementById: () => ({ src: '' }) },
-        fetch: async (a) => {
-          console.log('Fetch called with:', a);
-          return {
-            json: async () => ({ thumbnail_url: '' }),
-            text: async () => html
+        fetch: a => {
+          return resolve({ html, oembed_url: a }), {
+            json: () => ({ thumbnail_url: '' })
           };
         },
         gtag: () => 0,
-        Math: mathProxy,
-        XMLHttpRequest: function () {
-          return { open() { }, send() { } }
+        Math: { round: () => 0 },
+        XMLHttpRequest: function() {
+          return { open() {}, send() {} }
         },
         window: { location: { hostname: 'snaptik.app' } }
-      };
+      }));
 
-      const scriptFunction = new Function(...Object.keys(context), script1);
-      scriptFunction(...Object.values(context));
-
-      console.log('Evaluated HTML:', html);
-
-      return { html, oembed_url: 'some_oembed_url_placeholder' };
-    } catch (error) {
-      console.error('Error in eval_script:', error);
-      throw error;
-    }
+      Function(...k, script2)(...v);
+    });
   }
 
   async get_hd_video(token) {
-    try {
-      if (!token) throw new Error('Token is undefined or null');
-      const { data } = await this.axios.get(`/getHdLink.php?token=${encodeURIComponent(token)}`);
-      console.log('HD Video data received:', data);
-      if (!data.url) throw new Error('HD Video URL not found in response');
-      return data.url;
-    } catch (error) {
-      console.error('Error in get_hd_video:', error);
-      throw error;
-    }
+    const { data: { error, url } } = await this.axios({
+      url: '/getHdLink.php?token=' + token
+    });
+
+    if (error) throw new Error(error);
+    return url;
   }
 
   async parse_html(html) {
-    try {
-      console.log('Parsing HTML...');
-      const $ = cheerio.load(html);
-      const is_video = !$('div.render-wrapper').length;
-      console.log('Is video:', is_video);
+    const $ = cheerio.load(html);
+    const is_video = !$('div.render-wrapper').length;
 
-      if (is_video) {
-        // Try to find the HD token in different ways
-        let hd_token = $('div.video-links > button[data-tokenhd]').data('tokenhd');
-        console.log('HD Token (raw):', hd_token);
+    return is_video ? await (async () => {
+      const hd_token = $('div.video-links > button[data-tokenhd]').data('tokenhd');
+      const hd_url = new URL(await this.get_hd_video(hd_token));
+      const token = hd_url.searchParams.get('token');
+      const { url } = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
 
-        if (!hd_token) {
-          hd_token = $('button[data-tokenhd]').attr('data-tokenhd');
-          console.log('HD Token (alternative):', hd_token);
+      return {
+        type: 'video',
+        data: {
+          sources: [
+            url,
+            hd_url.href,
+            ...$('div.video-links > a:not(a[href="/"])').toArray()
+              .map(elem => $(elem).attr('href'))
+              .map(x => x.startsWith('/') ? this.axios.defaults.baseURL + x : x)
+          ].map((...x) => new Resource(...x))
         }
-
-        if (!hd_token) {
-          // Logging the full HTML for debugging
-          console.error('HTML Response:', html);
-          throw new Error('HD Token not found in the HTML response');
-        }
-
-        console.log('HD Token:', hd_token);
-
-        const hd_url = new URL(await this.get_hd_video(hd_token));
-        const token = hd_url.searchParams.get('token');
-        console.log('Token from URL:', token);
-
-        const decodedToken = atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'));
-        console.log('Decoded Token:', decodedToken);
-
-        const { url } = JSON.parse(decodedToken);
-
-        console.log('Video URL:', url);
-
-        return {
-          Engineer: 'Tabawa',
-          type: 'video',
-          data: {
-            sources: [
-              url,
-              hd_url.href,
-              ...$('div.video-links > a:not(a[href="/"])').toArray()
-                .map(elem => $(elem).attr('href'))
-                .map(x => x.startsWith('/') ? this.axios.defaults.baseURL + x : x)
-            ].map(url => new Resource(url))
-          }
-        };
-      } else {
-        return {
-          Engineer: 'Tabawa',
-          type: 'slideshow',
-          data: {
-            photos: $('div.columns > div.column > div.photo').toArray().map(elem => ({
-              sources: [
-                $(elem).find('img[alt="Photo"]').attr('src'),
-                $(elem).find('a[data-event="download_albumPhoto_photo"]').attr('href')
-              ].map(url => new Resource(url))
-            }))
-          }
-        };
+      };
+    })() : (x => x.data.photos.length == 1 ? ({
+      ...x,
+      type: 'photo',
+      data: {
+        sources: x.data.photos[0].sources
       }
-    } catch (error) {
-      console.error('Error in parse_html:', error);
-      throw error;
-    }
+    }) : x)({
+      type: 'slideshow',
+      data: {
+        photos: $('div.columns > div.column > div.photo').toArray().map(elem => ({
+          sources: [
+            $(elem).find('img[alt="Photo"]').attr('src'),
+            $(elem).find('a[data-event="download_albumPhoto_photo"]').attr('href')
+          ].map((...x) => new Resource(...x))
+        }))
+      }
+    });
   }
 
   async process(url) {
-    try {
-      const script = await this.get_script(url);
-      const { html, oembed_url } = await this.eval_script(script);
-      const data = await this.parse_html(html);
+    const script = await this.get_script(url);
+    const { html, oembed_url } = await this.eval_script(script);
 
-      return {
-        ...data,
-        url,
-        oembed_url
-      };
-    } catch (error) {
-      console.error('Error in process:', error);
-      throw error;
-    }
-  }
-}
+    const res = {
+      ...(await this.parse_html(html)),
+      url
+    };
 
-class Resource {
-  constructor(url) {
-    this.url = url;
+    return res.data.oembed_url = oembed_url, res;
   }
 }
 
 const apikeyAuth = ['tabawayoisaki', 'tabawahoshino'];
 const tikclient = new SnapTikClient();
 
+// Middleware
+router.use((req, res, next) => {
+  const ipPengunjung = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+  if (matcher.contains(ipPengunjung)) {
+    next();
+  } else {
+    res.status(403).json({
+      status: "403",
+      developer: "@Renkie",
+      ip: ipPengunjung,
+      message: 'Not authorized'
+    });
+  }
+});
+
+// Routes
 router.get("/tiktokdl", async (req, res) => {
   const { tiktokdl: url, apikey } = req.query;
 
@@ -255,27 +213,7 @@ router.get("/tiktokdl", async (req, res) => {
   }
 });
 
-router.get("/ip", (req, res) => { 
-  const ipPengunjung = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-
-  if (matcher.contains(ipPengunjung)) {
-    res.status(200).json({
-      status: "200",
-      developer: "@renkie",
-      ip: ipPengunjung,
-      message: 'Authorized'
-    });
-  } else {
-    res.status(403).json({
-      status: "403",
-      developer: "@Renkie",
-      ip: ipPengunjung,
-      message: 'Not authorized'
-    });
-  }
-});
-
-router.get("/status", async (req, res) => { 
+router.get("/status", async (req, res) => {
   try {
     const date = new Date();
     const jam = date.getHours();
@@ -284,7 +222,7 @@ router.get("/status", async (req, res) => {
     const ram = `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${Math.round(os.totalmem() / 1024 / 1024)}MB`;
     const cpu = os.cpus();
     const json = await (await fetch("https://api.ipify.org/?format=json")).json();
-    const status = { 
+    const status = {
       status: "online",
       memory: ram,
       cpu: cpu[0].model,
@@ -302,5 +240,25 @@ router.get("/status", async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
+router.get("/ip", (req, res) => {
+  const ipPengunjung = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+  if (matcher.contains(ipPengunjung)) {
+    res.status(200).json({
+      status: "200",
+      developer: "@renkie",
+      ip: ipPengunjung,
+      message: 'Authorized'
+    });
+  } else {
+    res.status(403).json({
+      status: "403",
+      developer: "@Renkie",
+      ip: ipPengunjung,
+      message: 'Not authorized' 
+      });
+    } 
+})
 
 module.exports = router;
