@@ -9,7 +9,8 @@ const router = express.Router();
 const app = express();
 const whitelist = ['192.168.1.0/24', '10.0.0.0/8', '158.178.243.123/32', '114.10.114.94/32'];
 const matcher = new CidrMatcher(whitelist);
-const apikeyAuth = ['tabawayoisaki']; 
+// Mock API Key authentication list
+const apikeyAuth = ['tabawayoisaki']; // Masukkan API key Anda yang valid di sini
 
 // Log messages
 const logsekai = {
@@ -66,7 +67,7 @@ router.get("/tiktokdl", async (req, res) => {
             const html = response.data;
             const $ = cheerio.load(html);
              
-            const engineering = "Tabawa"
+            const engineering = "Tabawa";
             const uniqueId = $('h2.font-extrabold.text-xl.text-center').text();
             const urls = $('a[title="zuo888z"]').attr('href');
             const thumbnail = $('a[title="zuo888z"] img').attr('src');
@@ -82,7 +83,7 @@ router.get("/tiktokdl", async (req, res) => {
 
             return { 
                 engineering,
-                author,
+                uniqueId,
                 urls,
                 thumbnail,
                 download,
