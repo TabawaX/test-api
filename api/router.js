@@ -59,11 +59,7 @@ router.get("/tiktokdl", async (req, res) => {
                 {
                     headers: {
                         'Accept': 'application/json, text/plain, */*',
-                        'Content-Type': 'application/json',
-                        'Cookie': '%5B%5B%22AKsRol968laQAHpzXggoXAlfTapcuDUSK799dVpD3KXwyCiLcqOaZ4d4pItRbzAl4mFZjbrFCrZkkdY82XmyQcCcA3c8RoIC_egHBMrPR4d3jiu6PNNtpOhYte6tvhxDT7ycMU7fy0WUT-pb2uwOAscLwke3vc44Zg%3D%3D%22%5D%5D', // Masukkan cookie Anda di sini
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                        'Referer': 'https://ttsave.app',
-                        'Origin': 'https://ttsave.app'
+                        'Content-Type': 'application/json'
                     }
                 }
             );
@@ -71,7 +67,6 @@ router.get("/tiktokdl", async (req, res) => {
             const html = response.data;
             const $ = cheerio.load(html);
 
-            const engineering = "Tabawa";
             const uniqueId = $('h2.font-extrabold.text-xl.text-center').text();
             const urls = $('a[title="zuo888z"]').attr('href');
             const thumbnail = $('a[title="zuo888z"] img').attr('src');
@@ -85,8 +80,7 @@ router.get("/tiktokdl", async (req, res) => {
                 });
             });
 
-            return { 
-                engineering,
+            return {
                 uniqueId,
                 urls,
                 thumbnail,
@@ -101,7 +95,12 @@ router.get("/tiktokdl", async (req, res) => {
     try {
         console.log('Processing URL:', url);
         const data = await ttdl(url);
-        res.json(data);
+        res.status(200).json({
+            engineering: "Tabawa",
+            url_video: data.urls,
+            thumbnail: data.thumbnail,
+            download_links: data.download
+        });
     } catch (error) {
         console.error('Error in /tiktokdl endpoint:', error);
         res.status(500).json({ error: error.message });
