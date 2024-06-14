@@ -185,12 +185,12 @@ router.get("/tiktokdl", async (req, res) => {
     let errorMessage = 'Internal Server Error';
     let statusCode = 500;
 
-    if (error.message.includes('URL error')) {
+    if (error.message && error.message.includes('URL error')) {
       errorMessage = 'URL error. Please check again';
       statusCode = 400;
     } else if (error.response && error.response.status) {
       statusCode = error.response.status;
-      errorMessage = error.message || 'Request failed with status code ' + statusCode;
+      errorMessage = error.message || `Request failed with status code ${statusCode}`;
     }
 
     res.status(statusCode).json({ error: errorMessage });
