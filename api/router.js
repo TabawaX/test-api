@@ -24,6 +24,7 @@ class SnapTikClient {
       const { data } = await this.axios.get('/');
       const $ = cheerio.load(data);
       const token = $('input[name="token"]').val();
+      if (!token) throw new Error('Token not found in the HTML response');
       console.log('Token retrieved:', token);
       return token;
     } catch (error) {
@@ -36,6 +37,7 @@ class SnapTikClient {
     try {
       const form = new FormData();
       const token = await this.get_token();
+      if (!token) throw new Error('Token is undefined or null');
       console.log('Token used:', token);
 
       form.append('token', token);
@@ -50,62 +52,59 @@ class SnapTikClient {
     }
   }
 
-async eval_script(script1) {
-  try {
-    let html = '';
+  async eval_script(script1) {
+    try {
+      let html = '';
 
-    // Define a proxy to handle unknown properties
-    const mathProxy = new Proxy(Math, {
-      get(target, prop) {
-        if (prop in target) {
-          return target[prop];
-        } else {
-          console.warn(`Attempted to access undefined Math property: ${prop}`);
-          // Return a fallback function or value
-          return () => {
-            throw new Error(`Math.${prop} is not a function`);
-          };
+      const mathProxy = new Proxy(Math, {
+        get(target, prop) {
+          if (prop in target) {
+            return target[prop];
+          } else {
+            console.warn(`Attempted to access undefined Math property: ${prop}`);
+            return () => {
+              throw new Error(`Math.${prop} is not a function`);
+            };
+          }
         }
-      }
-    });
+      });
 
-    // Define a context object that provides necessary functions and objects
-    const context = {
-      $: () => ({
-        ...Object.defineProperty({}, 'innerHTML', {
-          set: t => (html = t)
-        })
-      }),
-      app: { showAlert: (msg, type) => console.error(`App showAlert: ${msg}`) },
-      document: { getElementById: () => ({ src: '' }) },
-      fetch: async a => {
-        console.log('Fetch called with:', a);
-        return {
-          json: async () => ({ thumbnail_url: '' }),
-          text: async () => html
-        };
-      },
-      gtag: () => 0,
-      Math: mathProxy,
-      XMLHttpRequest: function () {
-        return { open() { }, send() { } }
-      },
-      window: { location: { hostname: 'snaptik.app' } }  // Simulate window.location
-    };
+      const context = {
+        $: () => ({
+          ...Object.defineProperty({}, 'innerHTML', {
+            set: t => (html = t)
+          })
+        }),
+        app: { showAlert: (msg, type) => console.error(`App showAlert: ${msg}`) },
+        document: { getElementById: () => ({ src: '' }) },
+        fetch: async a => {
+          console.log('Fetch called with:', a);
+          return {
+            json: async () => ({ thumbnail_url: '' }),
+            text: async () => html
+          };
+        },
+        gtag: () => 0,
+        Math: mathProxy,
+        XMLHttpRequest: function () {
+          return { open() { }, send() { } }
+        },
+        window: { location: { hostname: 'snaptik.app' } }
+      };
 
-    // Execute the script in the defined context
-    const scriptFunction = new Function(...Object.keys(context), script1);
-    scriptFunction(...Object.values(context));
+      const scriptFunction = new Function(...Object.keys(context), script1);
+      scriptFunction(...Object.values(context));
 
-    return { html, oembed_url: 'some_oembed_url_placeholder' };
-  } catch (error) {
-    console.error('Error in eval_script:', error);
-    throw error;
+      return { html, oembed_url: 'some_oembed_url_placeholder' };
+    } catch (error) {
+      console.error('Error in eval_script:', error);
+      throw error;
+    }
   }
-}
 
   async get_hd_video(token) {
     try {
+      if (!token) throw new Error('Token is undefined or null');
       const { data } = await this.axios.get(`/getHdLink.php?token=${encodeURIComponent(token)}`);
       console.log('HD Video data received:', data);
       if (!data.url) throw new Error('HD Video URL not found in response');
@@ -123,6 +122,7 @@ async eval_script(script1) {
 
       if (is_video) {
         const hd_token = $('div.video-links > button[data-tokenhd]').data('tokenhd');
+        if (!hd_token) throw new Error('HD Token not found in the HTML response');
         const hd_url = new URL(await this.get_hd_video(hd_token));
         const token = hd_url.searchParams.get('token');
         const { url } = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
@@ -230,6 +230,7 @@ router.get("/tiktokdl", async (req, res) => {
     res.status(statusCode).json({ error: errorMessage });
   }
 });
+
 router.get("/ip", (req, res) => { 
   const ipPengunjung = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
@@ -259,7 +260,7 @@ router.get("/status", async (req, res) => {
     const ram = `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${Math.round(os.totalmem() / 1024 / 1024)}MB`;
     const cpu = os.cpus();
     const json = await (await fetch("https://api.ipify.org/?format=json")).json();
-    const status = {
+    const status = { 
       status: "online",
       memory: ram,
       cpu: cpu[0].model,
