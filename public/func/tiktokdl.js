@@ -60,40 +60,45 @@ class SnapTikClient {
 
   async eval_script(script1) {
     console.log('Evaluating script...');
-    const script2 = await new Promise((resolve, reject) => {
-      try {
-        Function('eval', script1)(resolve);
-      } catch (error) {
-        reject(error);
-      }
-    });
+    try {
+      const script2 = await new Promise((resolve, reject) => {
+        try {
+          Function('resolve', script1)(resolve);
+        } catch (error) {
+          reject(error);
+        }
+      });
 
-    return new Promise((resolve, reject) => {
-      let html = '';
-      const [k, v] = ['keys', 'values'].map(x => Object[x]({
-        $: () => Object.defineProperty({
-          remove() {},
-          style: { display: '' }
-        }, 'innerHTML', { set: t => (html = t) }),
-        app: { showAlert: reject },
-        document: { getElementById: () => ({ src: '' }) },
-        fetch: a => {
-          return resolve({ html, oembed_url: a }), { json: () => ({ thumbnail_url: '' }) };
-        },
-        gtag: () => 0,
-        Math: { round: () => 0 },
-        XMLHttpRequest: function() {
-          return { open() {}, send() {} }
-        },
-        window: { location: { hostname: 'snaptik.app' } }
-      }));
+      return new Promise((resolve, reject) => {
+        let html = '';
+        const [k, v] = ['keys', 'values'].map(x => Object[x]({
+          $: () => Object.defineProperty({
+            remove() {},
+            style: { display: '' }
+          }, 'innerHTML', { set: t => (html = t) }),
+          app: { showAlert: reject },
+          document: { getElementById: () => ({ src: '' }) },
+          fetch: a => {
+            return resolve({ html, oembed_url: a }), { json: () => ({ thumbnail_url: '' }) };
+          },
+          gtag: () => 0,
+          Math: { round: () => 0 },
+          XMLHttpRequest: function() {
+            return { open() {}, send() {} }
+          },
+          window: { location: { hostname: 'snaptik.app' } }
+        }));
 
-      try {
-        Function(...k, script2)(...v);
-      } catch (error) {
-        reject(error);
-      }
-    });
+        try {
+          Function(...k, script2)(...v);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    } catch (error) {
+      console.error('Error during script evaluation:', error);
+      throw new Error('Script evaluation failed.');
+    }
   }
 
   async get_hd_video(token) {
@@ -152,17 +157,22 @@ class SnapTikClient {
 
   async process(url) {
     console.log('Processing URL:', url);
-    const script = await this.get_script(url);
-    const { html, oembed_url } = await this.eval_script(script);
+    try {
+      const script = await this.get_script(url);
+      const { html, oembed_url } = await this.eval_script(script);
 
-    const res = {
-      ...(await this.parse_html(html)),
-      url,
-      oembed_url
-    };
+      const res = {
+        ...(await this.parse_html(html)),
+        url,
+        oembed_url
+      };
 
-    console.log('Processing complete.');
-    return res;
+      console.log('Processing complete.');
+      return res;
+    } catch (error) {
+      console.error('Error in process:', error);
+      throw error;
+    }
   }
 }
 
