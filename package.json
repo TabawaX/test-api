@@ -17,6 +17,7 @@
     "node-fetch": "^2.6.1",
     "axios": "^0.21.1",
     "cors": "^2.8.5",
-    "ssl-express-www": "^3.0.7"
+    "ssl-express-www": "^3.0.7",
+    "atob": "^2.2.2"  
   }
 }
