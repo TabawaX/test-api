@@ -50,7 +50,6 @@ class SnapTikClient {
     }
   }
 
-
 async eval_script(script1) {
   try {
     let html = '';
@@ -72,7 +71,12 @@ async eval_script(script1) {
         };
       },
       gtag: () => 0,
-      Math: { round: () => Math.round(+new Date() / 1000) },
+      Math: {
+        ...Math, // Spread the existing Math object to keep its methods
+        _0xc30e: {
+          8: 'random', // This is an example. You need to map it to the correct method
+        }
+      },
       XMLHttpRequest: function () {
         return { open() { }, send() { } }
       },
