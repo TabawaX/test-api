@@ -10,10 +10,6 @@ const app = express();
 const whitelist = ['192.168.1.0/24', '10.0.0.0/8', '158.178.243.123/32', '114.10.114.94/32'];
 const matcher = new CidrMatcher(whitelist);
 
-.eval // const axios = require('axios');
-const cheerio = require('cheerio');
-const FormData = require('form-data');
-
 class Resource {
   constructor(url, index) {
     this.index = index;
