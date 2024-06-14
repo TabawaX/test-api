@@ -63,7 +63,11 @@ class SnapTikClient {
     try {
       const script2 = await new Promise((resolve, reject) => {
         try {
-          Function('resolve', script1)(resolve);
+          Function('resolve', 'window', 'document', 'XMLHttpRequest', script1)(resolve, {}, {
+            getElementById: () => ({ src: '' }),
+          }, function() {
+            return { open() {}, send() {} }
+          });
         } catch (error) {
           reject(error);
         }
