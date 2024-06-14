@@ -54,6 +54,21 @@ async eval_script(script1) {
   try {
     let html = '';
 
+    // Define a proxy to handle unknown properties
+    const mathProxy = new Proxy(Math, {
+      get(target, prop) {
+        if (prop in target) {
+          return target[prop];
+        } else {
+          console.warn(`Attempted to access undefined Math property: ${prop}`);
+          // Return a fallback function or value
+          return () => {
+            throw new Error(`Math.${prop} is not a function`);
+          };
+        }
+      }
+    });
+
     // Define a context object that provides necessary functions and objects
     const context = {
       $: () => ({
@@ -71,12 +86,7 @@ async eval_script(script1) {
         };
       },
       gtag: () => 0,
-      Math: {
-        ...Math, // Spread the existing Math object to keep its methods
-        _0xc30e: {
-          8: 'random', // This is an example. You need to map it to the correct method
-        }
-      },
+      Math: mathProxy,
       XMLHttpRequest: function () {
         return { open() { }, send() { } }
       },
