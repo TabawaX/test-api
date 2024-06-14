@@ -3,17 +3,15 @@ const { performance } = require('perf_hooks');
 const fetch = require('node-fetch');
 const os = require('os');
 const CidrMatcher = require('cidr-matcher');
+const SnapTikClient = require('../public/func/tiktokdl');
 
 const router = express.Router();
 
 const whitelist = ['192.168.1.0/24', '10.0.0.0/8', '158.178.243.123/32', '114.10.114.94/32'];
-const matcher = new CidrMatcher(whitelist)
-
-const SnapTikClient = require('../public/func/tiktokdl');
+const matcher = new CidrMatcher(whitelist);
 
 const tikclient = new SnapTikClient();
-
-const apikeyAuth = ['tabawayoisaki', 'tabawahoshino']; // Update with your valid API keys
+const apikeyAuth = ['tabawayoisaki', 'tabawahoshino']; 
 
 router.get("/tiktokdl", async (req, res) => {
   const { tiktokdl: url, apikey } = req.query;
@@ -31,12 +29,32 @@ router.get("/tiktokdl", async (req, res) => {
   }
 
   try {
-    console.log('Received TikTok URL:', url); // Log the TikTok URL
-
-    res.json({ url }); // Temporarily respond with the received URL
+    const data = await tikclient.process(url);
+    res.json(data);
   } catch (error) {
     console.error('Error in /tiktokdl endpoint:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.get("/ip", (req, res) => { 
+  const ipPengunjung = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  console.log(`Visitor IP: ${ipPengunjung}`);
+
+  if (matcher.contains(ipPengunjung)) {
+    res.status(200).json({
+      status: "200",
+      developer: "@renkie",
+      ip: ipPengunjung,
+      message: 'Authorized'
+    });
+  } else {
+    res.status(403).json({
+      status: "403",
+      developer: "@Renkie",
+      ip: ipPengunjung,
+      message: 'Not authorized'
+    });
   }
 });
 
@@ -61,12 +79,12 @@ router.get("/status", async (req, res) => {
       speed: `${neww - old}ms`,
       info: {
         developer: "Renkie",
-        apikey: "Kagak Ada :v",
+        apikey: "None",
       },
     };
     res.json(status);
   } catch (error) {
-    console.error('Error di route /api/status:', error);
+    console.error('Error in /status route:', error);
     res.status(500).json({
       message: 'Internal Server Error'
     });
