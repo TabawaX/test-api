@@ -60,7 +60,10 @@ router.get("/tiktokdl", async (req, res) => {
                     headers: {
                         'Accept': 'application/json, text/plain, */*',
                         'Content-Type': 'application/json',
-                        'Cookie': '%5B%5B%22AKsRol968laQAHpzXggoXAlfTapcuDUSK799dVpD3KXwyCiLcqOaZ4d4pItRbzAl4mFZjbrFCrZkkdY82XmyQcCcA3c8RoIC_egHBMrPR4d3jiu6PNNtpOhYte6tvhxDT7ycMU7fy0WUT-pb2uwOAscLwke3vc44Zg%3D%3D%22%5D%5D' // Masukkan cookie Anda di sini
+                        'Cookie': '%5B%5B%22AKsRol968laQAHpzXggoXAlfTapcuDUSK799dVpD3KXwyCiLcqOaZ4d4pItRbzAl4mFZjbrFCrZkkdY82XmyQcCcA3c8RoIC_egHBMrPR4d3jiu6PNNtpOhYte6tvhxDT7ycMU7fy0WUT-pb2uwOAscLwke3vc44Zg%3D%3D%22%5D%5D', // Masukkan cookie Anda di sini
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                        'Referer': 'https://ttsave.app',
+                        'Origin': 'https://ttsave.app'
                     }
                 }
             );
@@ -90,7 +93,7 @@ router.get("/tiktokdl", async (req, res) => {
                 download,
             };
         } catch (error) {
-            console.error(error);
+            console.error('Error in ttdl function:', error);
             throw error;
         }
     }
