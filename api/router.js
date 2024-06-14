@@ -78,7 +78,7 @@ async eval_script(script1) {
           return { open() { }, send() { } }
         }
       }),
-      window: { location: { hostname: 'kislana.my.id' } }  // Simulate window.location
+      window: { location: { hostname: 'snaptik.app' } }  // Simulate window.location
     };
 
     // Execute the script in the defined context
