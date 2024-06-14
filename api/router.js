@@ -89,16 +89,16 @@ async eval_script(script1) {
 }
 
   async get_hd_video(token) {
-    try {
-      const { data } = await this.axios.get(`/getHdLink.php?token=${token}`);
-      console.log('HD Video data received:', data);
-      if (data.error) throw new Error(data.error);
-      return data.url;
-    } catch (error) {
-      console.error('Error in get_hd_video:', error);
-      throw error;
-    }
+  try {
+    const { data } = await this.axios.get(`/getHdLink.php?token=${token}`);
+    console.log('HD Video data received:', data);
+    if (data.error) throw new Error(data.error);
+    return data.url;
+  } catch (error) {
+    console.error('Error in get_hd_video:', error);
+    throw error;
   }
+}
 
   async parse_html(html) {
     try {
