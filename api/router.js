@@ -10,7 +10,10 @@ const app = express();
 const whitelist = ['192.168.1.0/24', '10.0.0.0/8', '158.178.243.123/32', '114.10.114.94/32'];
 const matcher = new CidrMatcher(whitelist);
 
-// Classes
+.eval // const axios = require('axios');
+const cheerio = require('cheerio');
+const FormData = require('form-data');
+
 class Resource {
   constructor(url, index) {
     this.index = index;
@@ -26,16 +29,23 @@ class Resource {
   }
 }
 
+/*
+  * Scraper By https://github.com/0x6a69616e
+  * Forbidden to sell and delete my wm 
+*/
+
 class SnapTikClient {
   constructor(config = {}) {
-    this.axios = axios.create({
+    this.axios = axios.create(this.config = {
       baseURL: 'https://dev.snaptik.app',
       ...config,
     });
   }
 
   async get_token() {
-    const { data } = await this.axios({
+    const {
+      data
+    } = await this.axios({
       url: '/'
     });
     const $ = cheerio.load(data);
@@ -49,7 +59,9 @@ class SnapTikClient {
     form.append('token', token);
     form.append('url', url);
 
-    const { data } = await this.axios({
+    const {
+      data
+    } = await this.axios({
       url: '/abc2.php',
       method: 'POST',
       data: form
@@ -58,30 +70,63 @@ class SnapTikClient {
     return data;
   }
 
+/*
+  * Scraper By https://github.com/0x6a69616e
+  * Forbidden to sell and delete my wm 
+*/
+
   async eval_script(script1) {
     const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
     return new Promise((resolve, reject) => {
       let html = '';
-      const [k, v] = ['keys', 'values'].map(x => Object[x]({
+      const [
+        k,
+        v
+      ] = [
+        'keys',
+        'values'
+      ].map(x => Object[x]({
         $: () => Object.defineProperty({
           remove() {},
-          style: { display: '' }
+          style: {
+            display: ''
+          }
         }, 'innerHTML', {
           set: t => (html = t)
         }),
-        app: { showAlert: reject },
-        document: { getElementById: () => ({ src: '' }) },
+        app: {
+          showAlert: reject
+        },
+        document: {
+          getElementById: () => ({
+            src: ''
+          })
+        },
         fetch: a => {
-          return resolve({ html, oembed_url: a }), {
-            json: () => ({ thumbnail_url: '' })
+          return resolve({
+            html,
+            oembed_url: a
+          }), {
+            json: () => ({
+              thumbnail_url: ''
+            })
           };
         },
         gtag: () => 0,
-        Math: { round: () => 0 },
-        XMLHttpRequest: function() {
-          return { open() {}, send() {} }
+        Math: {
+          round: () => 0
         },
-        window: { location: { hostname: 'snaptik.app' } }
+        XMLHttpRequest: function() {
+          return {
+            open() {},
+            send() {}
+          }
+        },
+        window: {
+          location: {
+            hostname: 'snaptik.app'
+          }
+        }
       }));
 
       Function(...k, script2)(...v);
@@ -89,7 +134,12 @@ class SnapTikClient {
   }
 
   async get_hd_video(token) {
-    const { data: { error, url } } = await this.axios({
+    const {
+      data: {
+        error,
+        url
+      }
+    } = await this.axios({
       url: '/getHdLink.php?token=' + token
     });
 
@@ -105,7 +155,9 @@ class SnapTikClient {
       const hd_token = $('div.video-links > button[data-tokenhd]').data('tokenhd');
       const hd_url = new URL(await this.get_hd_video(hd_token));
       const token = hd_url.searchParams.get('token');
-      const { url } = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      const {
+        url
+      } = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
 
       return {
         type: 'video',
@@ -114,8 +166,8 @@ class SnapTikClient {
             url,
             hd_url.href,
             ...$('div.video-links > a:not(a[href="/"])').toArray()
-              .map(elem => $(elem).attr('href'))
-              .map(x => x.startsWith('/') ? this.axios.defaults.baseURL + x : x)
+            .map(elem => $(elem).attr('href'))
+            .map(x => x.startsWith('/') ? this.config.baseURL + x : x)
           ].map((...x) => new Resource(...x))
         }
       };
@@ -137,10 +189,18 @@ class SnapTikClient {
       }
     });
   }
+  
+/*
+  * Scraper By https://github.com/0x6a69616e
+  * Forbidden to sell and delete my wm 
+*/
 
   async process(url) {
     const script = await this.get_script(url);
-    const { html, oembed_url } = await this.eval_script(script);
+    const {
+      html,
+      oembed_url
+    } = await this.eval_script(script);
 
     const res = {
       ...(await this.parse_html(html)),
@@ -151,8 +211,9 @@ class SnapTikClient {
   }
 }
 
+
 const apikeyAuth = ['tabawayoisaki', 'tabawahoshino'];
-const tikclient = new SnapTikClient();
+const client = new SnapTikClient();
 
 // Routes
 router.get("/tiktokdl", async (req, res) => {
@@ -173,12 +234,10 @@ router.get("/tiktokdl", async (req, res) => {
   try {
     console.log('Processing URL:', url);
 
-    const data = await tikclient.process(url); // Ensure `tikclient` is correctly instantiated
-    const prettyJson = JSON.stringify(data, null, 2);
-
+    const data = JSON.stringify(await client.process(url), null, 2)
     console.log('Processed data:', data);
 
-    res.header('Content-Type', 'application/json').send(prettyJson);
+    res.json(data)
   } catch (error) {
     console.error('Error in /tiktokdl endpoint:', error);
 
