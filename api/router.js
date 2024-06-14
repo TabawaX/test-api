@@ -117,12 +117,16 @@ class SnapTikClient {
 
   async parse_html(html) {
     try {
+      console.log('Parsing HTML...');
       const $ = cheerio.load(html);
       const is_video = !$('div.render-wrapper').length;
+      console.log('Is video:', is_video);
 
       if (is_video) {
         const hd_token = $('div.video-links > button[data-tokenhd]').data('tokenhd');
         if (!hd_token) throw new Error('HD Token not found in the HTML response');
+        console.log('HD Token:', hd_token);
+
         const hd_url = new URL(await this.get_hd_video(hd_token));
         const token = hd_url.searchParams.get('token');
         const { url } = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
