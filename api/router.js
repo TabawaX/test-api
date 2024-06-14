@@ -115,7 +115,7 @@ class SnapTikClient {
     }
   }
 
-  async parse_html(html) {
+async parse_html(html) {
     try {
         console.log('Parsing HTML...');
         const $ = cheerio.load(html);
@@ -123,8 +123,14 @@ class SnapTikClient {
         console.log('Is video:', is_video);
 
         if (is_video) {
-            const hd_token = $('div.video-links > button[data-tokenhd]').data('tokenhd');
+            // Try to find the HD token in different ways
+            let hd_token = $('div.video-links > button[data-tokenhd]').data('tokenhd');
             console.log('HD Token (raw):', hd_token);
+
+            if (!hd_token) {
+                hd_token = $('button[data-tokenhd]').attr('data-tokenhd');
+                console.log('HD Token (alternative):', hd_token);
+            }
 
             if (!hd_token) {
                 // Logging the full HTML for debugging
