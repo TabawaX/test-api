@@ -1,4 +1,3 @@
-
 const axios = require('axios');
 const cheerio = require('cheerio');
 const FormData = require('form-data');
@@ -30,6 +29,9 @@ class SnapTikClient {
     const { data } = await this.axios({ url: '/' });
     const $ = cheerio.load(data);
     const token = $('input[name="token"]').val();
+    if (!token) {
+      throw new Error('Failed to fetch token.');
+    }
     console.log('Token fetched:', token);
     return token;
   }
@@ -48,13 +50,24 @@ class SnapTikClient {
       data: form
     });
 
+    if (!data) {
+      throw new Error('Failed to fetch script.');
+    }
+
     console.log('Script fetched.');
     return data;
   }
 
   async eval_script(script1) {
     console.log('Evaluating script...');
-    const script2 = await new Promise(resolve => Function('eval', script1)(resolve));
+    const script2 = await new Promise((resolve, reject) => {
+      try {
+        Function('eval', script1)(resolve);
+      } catch (error) {
+        reject(error);
+      }
+    });
+
     return new Promise((resolve, reject) => {
       let html = '';
       const [k, v] = ['keys', 'values'].map(x => Object[x]({
@@ -75,7 +88,11 @@ class SnapTikClient {
         window: { location: { hostname: 'snaptik.app' } }
       }));
 
-      Function(...k, script2)(...v);
+      try {
+        Function(...k, script2)(...v);
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 
