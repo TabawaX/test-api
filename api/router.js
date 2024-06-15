@@ -36,19 +36,6 @@ const logsekai = {
     },
 };
 
-// Routes
-router.get("/pinterest", async (req, res) => {
-    const text = req.query.text;
-    const apikey = req.query.apikey;
-
-    if (!text) return res.status(403).json(logsekai.butuhurl);
-    if (!apikey) return res.status(403).json(logsekai.noapikey);
-
-    if (!apikeyAuth.includes(apikey)) {
-        return res.status(403).json({ error: 'Invalid API key' });
-    }
-
-
 async function pinterest(query) {
     return new Promise(async (resolve, reject) => {
         try {
@@ -86,16 +73,28 @@ async function pinterest(query) {
     });
 }
 
-    try {
-        const images = await pinterest(text);
-        res.status(200).json({
-            engineering: "Tabawa",
-            data: ${images}
-        });
-    } catch (error) {
-        console.error('Error in /pinterest endpoint:', error);
-        res.status(500).json({ error: error.message });
+router.get("/pinterest", async (req, res) => {
+    const apikey = req.query.apikey;
+    const text = req.query.text;
+
+    if (!text) return res.status(403).json(logsekai.butuhurl);
+    if (!apikey) return res.status(403).json(logsekai.noapikey);
+
+    if (!apikeyAuth.includes(apikey)) {
+        return res.status(403).json({ error: 'Invalid API key' });
     }
+
+    pinterest(text)
+        .then(images => {
+            res.status(200).json({
+                engineering: "Tabawa",
+                data: images
+            });
+        })
+        .catch(error => {
+            console.error('Error in /pinterest endpoint:', error);
+            res.status(500).json({ error: error.message });
+        });
 });
 
 router.get("/status", async (req, res) => {
