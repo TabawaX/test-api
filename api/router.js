@@ -74,12 +74,12 @@ async function pinterest(query) {
 }
 
 router.get("/pinterest", async (req, res) => {
-    const apikey = req.query.apikey;
-    const text = req.query.text;
+    var apikey = req.query.apikey;
+    var text = req.query.text;
 
-    if (!text) return res.status(403).json(logsekai.butuhurl);
+    
     if (!apikey) return res.status(403).json(logsekai.noapikey);
-
+    if (!text) return res.status(403).json(logsekai.butuhurl);
     if (!apikeyAuth.includes(apikey)) {
         return res.status(403).json({ error: 'Invalid API key' });
     }
