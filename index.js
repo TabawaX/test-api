@@ -5,7 +5,11 @@ const path = require("path");
 
 const app = express();
 const __path = process.cwd();
+const swaggerJsdoc = require("swagger-jsdoc")
+const swaggerUi = require("swagger-ui-express");
 
+// middleware
+app.use(express.json());
 app.enable("trust proxy");
 app.set("json spaces", 2);
 app.use(cors());
@@ -40,6 +44,45 @@ app.use((err, req, res, next) => {
     message: 'Internal Server Error'
   });
 });
+
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Kislana API's",
+      version: "0.1.0",
+      description:
+        "list of available apis, thanks to swagger team to make it easier for me using this docs",
+      contact: {
+        name: "Group Whatsapp Support",
+        url: "https://chat.whatsapp.com/GSkuBCr2IGwEXZ4HwFhzmN",
+      },
+    },
+    tags: [
+      {
+        name: "Search",
+        description: "Search  API's"
+      },
+      {
+        name: "Server",
+        description: "API Servers"
+      }
+    ],
+    servers: [
+      {
+        url: "https://kislana.my.id/",
+      },
+    ],
+  },
+  apis: ["./api/router.js"],
+};
+
+const specs = swaggerJsdoc(options);
+app.use(
+  "/api",
+  swaggerUi.serve,
+  swaggerUi.setup(specs)
+);
 
 const PORT = 8000; 
 app.listen(PORT, () => {
