@@ -5,7 +5,7 @@ const path = require("path");
 
 const app = express();
 const __path = process.cwd();
-const statistik(./public)
+const = statistik(./public)
 
 
 // middleware
