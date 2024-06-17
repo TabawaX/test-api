@@ -13,8 +13,10 @@ app.set("json spaces", 2);
 app.use(cors());
 app.use(secure);
 
+const statistik(./public)
 
-app.use(express.static(path.join(__dirname, './')))
+
+app.use(express.static(statistik)
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__path, "sekai-page", "home.html"));
