@@ -64,7 +64,7 @@ const options = {
       },
     ],
   },
-  apis: ["./api/router.js"],
+  apis: ["./api/router"],
 };
 
 const specs = swaggerJsdoc(options);
