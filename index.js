@@ -12,7 +12,7 @@ app.use(cors());
 app.use(secure);
 
 
-app.use(express.static(path.join(__path, "public")));
+app.use(express.static(path.join(__dirname, './')))
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__path, "sekai-page", "home.html"));
