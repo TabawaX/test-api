@@ -58,16 +58,6 @@ const options = {
         url: "https://chat.whatsapp.com/GSkuBCr2IGwEXZ4HwFhzmN",
       },
     },
-    tags: [
-      {
-        name: "Search",
-        description: "Search  API's"
-      },
-      {
-        name: "Server",
-        description: "API Servers"
-      }
-    ],
     servers: [
       {
         url: "https://kislana.my.id/",
