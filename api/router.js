@@ -64,6 +64,46 @@ async function pinterest(query) {
     }
 }
 
+/**
+ * @swagger
+ * /pinterest:
+ *   get:
+ *     summary: Search Pinterest images
+ *     tags:
+ *       - Search
+ *     parameters:
+ *       - in: query
+ *         name: apikey
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: API key
+ *       - in: query
+ *         name: text
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Text to search on Pinterest
+ *     responses:
+ *       200:
+ *         description: Successfully searched images
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 engineering:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       403:
+ *         description: Forbidden
+ *       500:
+ *         description: Internal Server Error
+ */
+
 router.get("/pinterest", async (req, res) => {
     var apikey = req.query.apikey;
     var text = req.query.text;
@@ -87,6 +127,45 @@ router.get("/pinterest", async (req, res) => {
             res.status(500).json({ error: error.message });
         });
 });
+
+
+/**
+ * @swagger
+ * /status:
+ *   get:
+ *     summary: Get server status
+ *     tags:
+ *       - Server
+ *     responses:
+ *       200:
+ *         description: Server status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                 memory:
+ *                   type: string
+ *                 cpu:
+ *                   type: string
+ *                 ip:
+ *                   type: string
+ *                 time:
+ *                   type: string
+ *                 uptime:
+ *                   type: string
+ *                 info:
+ *                   type: object
+ *                   properties:
+ *                     developer:
+ *                       type: string
+ *                     apikey:
+ *                       type: string
+ *       500:
+ *         description: Internal Server Error
+ */
 
 router.get("/status", async (req, res) => {
   try {
@@ -115,6 +194,33 @@ router.get("/status", async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
+/**
+ * @swagger
+ * /ip:
+ *   get:
+ *     summary: Get visitor's IP address
+ *     tags:
+ *       - Server
+ *     responses:
+ *       200:
+ *         description: Authorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                 developer:
+ *                   type: string
+ *                 ip:
+ *                   type: string
+ *                 message:
+ *                   type: string
+ *       403:
+ *         description: Not authorized
+ */
 
 router.get("/ip", (req, res) => {
   const ipPengunjung = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
