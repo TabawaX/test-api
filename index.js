@@ -15,7 +15,7 @@ app.set("json spaces", 2);
 app.use(cors());
 app.use(secure);
 
-app.use(express.static(statistik)
+app.use(express.static(statistik))
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__path, "sekai-page", "home.html"));
