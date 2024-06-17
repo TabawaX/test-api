@@ -17,6 +17,13 @@ app.use(secure);
 
 app.use(express.static(statistik))
 
+
+app.use((req, res, next) => {
+  console.log(`Request URL: ${req.url}`);
+  next();
+});
+
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(__path, "sekai-page", "home.html"));
 });
