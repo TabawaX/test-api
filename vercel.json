@@ -11,6 +11,6 @@
     { "src": "/api-docs", "dest": "index.js" },
     { "src": "/docs", "dest": "index.js" },
     { "src": "/", "dest": "index.js" },
-    { "src": "/(.*)", "dest": "/public/$1" }
+    { "src": "/(.*)", "dest": "index.js" }
   ]
 }
