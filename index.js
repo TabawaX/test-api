@@ -5,6 +5,8 @@ const path = require("path");
 
 const app = express();
 const __path = process.cwd();
+const statistik(./public)
+
 
 // middleware
 app.use(express.json());
@@ -12,9 +14,6 @@ app.enable("trust proxy");
 app.set("json spaces", 2);
 app.use(cors());
 app.use(secure);
-
-const statistik(./public)
-
 
 app.use(express.static(statistik)
 
