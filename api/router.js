@@ -7,12 +7,12 @@ const os = require('os');
 
 const router = express.Router();
 const app = express();
-const whitelist = ['192.168.1.0/24', '10.0.0.0/8', '158.178.243.123/32', '114.10.114.94/32'];
+const whitelist = ['192.168.1.0/24', '10.0.0.0/8', '158.178.243.123/32', '114.10.114.94/32', '45.142.115.222/32'];
 const matcher = new CidrMatcher(whitelist);
-// Mock API Key authentication list
-const apikeyAuth = ['tabawayoisaki']; // Masukkan API key Anda yang valid di sini
 
-// Log messages
+const apikeyAuth = ['tabawayoisaki'];
+
+
 const logsekai = {
     noapikey: {
         engineering: `@renkie`,
