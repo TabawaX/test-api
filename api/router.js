@@ -107,7 +107,7 @@ router.get("/status", async (req, res) => {
       uptime: `${Math.floor(process.uptime() / 3600)}h ${Math.floor((process.uptime() % 3600) / 60)}m ${Math.floor(process.uptime() % 60)}s`,
       info: {
         developer: "Renkie",
-        apikey: "None",
+        apikey: "tabawayoisaki",
       },
     };
     res.json(status);
