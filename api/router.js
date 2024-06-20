@@ -7,34 +7,32 @@ const os = require('os');
 const fetch = require('node-fetch');
 
 const router = express.Router();
-const app = express();
 const whitelist = ['192.168.1.0/24', '10.0.0.0/8', '158.178.243.123/32', '114.10.114.94/32', '45.142.115.222/32', '114.5.110.185/32'];
 const matcher = new CidrMatcher(whitelist);
 
 const apikeyAuth = ['tabawayoisaki'];
 
-
 const logsekai = {
-    noapikey: {
-        engineering: `@renkie`,
-        status: 403,
-        message: "Need Apikey? Contact Developer",
-    },
-    error: {
-        engineering: `@renkie`,
-        status: 503,
-        message: "Locked 403",
-    },
-    apikey: {
-        engineering: `@renkie`,
-        status: 403,
-        message: "Butuh Apikey? Contact Developer",
-    },
-    butuhurl: {
-        engineering: `@renkie`,
-        status: 403,
-        message: "I Need a URL!",
-    },
+  noapikey: {
+    engineering: `@renkie`,
+    status: 403,
+    message: "Need Apikey? Contact Developer",
+  },
+  error: {
+    engineering: `@renkie`,
+    status: 503,
+    message: "Locked 403",
+  },
+  apikey: {
+    engineering: `@renkie`,
+    status: 403,
+    message: "Butuh Apikey? Contact Developer",
+  },
+  butuhurl: {
+    engineering: `@renkie`,
+    status: 403,
+    message: "I Need a URL!",
+  },
 };
 
 async function pinterest(query) {
@@ -79,7 +77,7 @@ async function pinterest(query) {
   }
 }
 
-app.get('/pinterest', (req, res) => {
+router.get('/pinterest', (req, res) => {
   const apikey = req.query.apikey;
   const text = req.query.text;
 
@@ -97,7 +95,7 @@ app.get('/pinterest', (req, res) => {
       console.error('Error in /pinterest endpoint:', error);
       res.status(500).json({ error: 'Internal Server Error' });
     });
-})
+});
 
 router.get("/status", async (req, res) => {
   try {
@@ -143,8 +141,8 @@ router.get("/ip", (req, res) => {
       developer: "@Renkie",
       ip: ipPengunjung,
       message: 'Not authorized' 
-      });
-    } 
-})
+    });
+  }
+});
 
 module.exports = router;
