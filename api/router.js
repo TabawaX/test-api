@@ -4,6 +4,7 @@ const cheerio = require('cheerio');
 const FormData = require('form-data');
 const CidrMatcher = require('cidr-matcher');
 const os = require('os');
+const fetch = require('node-fetch');
 
 const router = express.Router();
 const app = express();
@@ -37,57 +38,66 @@ const logsekai = {
 };
 
 async function pinterest(query) {
-    const encodedQuery = encodeURIComponent(query);
-    const url = `https://id.pinterest.com/search/pins/?autologin=true&q=${encodedQuery}`;
+  const baseUrl = 'https://www.pinterest.com/resource/BaseSearchResource/get/';
+  const queryParams = {
+    source_url: '/search/pins/?q=' + encodeURIComponent(query),
+    data: JSON.stringify({
+      options: {
+        isPrefetch: false,
+        query,
+        scope: 'pins',
+        no_fetch_context_on_resource: false
+      },
+      context: {}
+    }),
+    _: Date.now()
+  };
+  const url = new URL(baseUrl);
+  Object.entries(queryParams).forEach(entry => url.searchParams.set(entry[0], entry[1]));
 
-    const response = await axios.get(url, {
-        headers: {
-            "cookie": "_auth=1; _b=\"AVna7S1p7l1C5I9u0+nR3YzijpvXOPc6d09SyCzO+DcwpersQH36SmGiYfymBKhZcGg=\"; _pinterest_sess=TWc9PSZHamJOZ0JobUFiSEpSN3Z4a2NsMk9wZ3gxL1NSc2k2NkFLaUw5bVY5cXR5alZHR0gxY2h2MVZDZlNQalNpUUJFRVR5L3NlYy9JZkthekp3bHo5bXFuaFZzVHJFMnkrR3lTbm56U3YvQXBBTW96VUgzVUhuK1Z4VURGKzczUi9hNHdDeTJ5Y2pBTmxhc2owZ2hkSGlDemtUSnYvVXh5dDNkaDN3TjZCTk8ycTdHRHVsOFg2b2NQWCtpOWxqeDNjNkk3cS85MkhhSklSb0hwTnZvZVFyZmJEUllwbG9UVnpCYVNTRzZxOXNJcmduOVc4aURtM3NtRFo3STlmWjJvSjlWTU5ITzg0VUg1NGhOTEZzME9SNFNhVWJRWjRJK3pGMFA4Q3UvcHBnWHdaYXZpa2FUNkx6Z3RNQjEzTFJEOHZoaHRvazc1c1UrYlRuUmdKcDg3ZEY4cjNtZlBLRTRBZjNYK0lPTXZJTzQ5dU8ybDdVS015bWJKT0tjTWYyRlBzclpiamdsNmtpeUZnRjlwVGJXUmdOMXdTUkFHRWloVjBMR0JlTE5YcmhxVHdoNzFHbDZ0YmFHZ1VLQXU1QnpkM1FqUTNMTnhYb3VKeDVGbnhNSkdkNXFSMXQybjRGL3pyZXRLR0ZTc0xHZ0JvbTJCNnAzQzE0cW1WTndIK0trY05HV1gxS09NRktadnFCSDR2YzBoWmRiUGZiWXFQNjcwWmZhaDZQRm1UbzNxc21pV1p5WDlabm1UWGQzanc1SGlrZXB1bDVDWXQvUis3elN2SVFDbm1DSVE5Z0d4YW1sa2hsSkZJb1h0MTFpck5BdDR0d0lZOW1Pa2RDVzNySWpXWmUwOUFhQmFSVUpaOFQ3WlhOQldNMkExeDIvMjZHeXdnNjdMYWdiQUhUSEFBUlhUVTdBMThRRmh1ekJMYWZ2YTJkNlg0cmFCdnU2WEpwcXlPOVZYcGNhNkZDd051S3lGZmo0eHV0ZE42NW8xRm5aRWpoQnNKNnNlSGFad1MzOHNkdWtER0xQTFN5Z3lmRERsZnZWWE5CZEJneVRlMDd2VmNPMjloK0g5eCswZUVJTS9CRkFweHc5RUh6K1JocGN6clc1JmZtL3JhRE1sc0NMTFlpMVErRGtPcllvTGdldz0=; _ir=0"
-        }
-    });
-
-    const $ = cheerio.load(response.data);
-    const imageLinks = [];
-
-    $('div[data-test-id="pinWrapper"] img').each((index, element) => {
-        const link = $(element).attr('src');
-        if (link) {
-            imageLinks.push(link.replace(/236x/g, '736x'));
-        }
-    });
-
-    if (imageLinks.length > 0) {
-        const shuffledImages = imageLinks.sort(() => 0.5 - Math.random()).slice(0, 50);
-        return shuffledImages;
-    } else {
-        throw new Error('No images found');
-    }
+  try {
+    const json = await (await fetch(url.toString())).json();
+    const results = json.resource_response?.data?.results ?? [];
+    return {
+      engineer: "tabawa renki",
+      data: results.map(item => ({
+        created_at: (new Date(item.created_at)).toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        }) ?? '',
+        url_pin: item.images?.['736x']?.url ?? '',
+        judul_pin: item.grid_title ?? ''
+      }))
+    };
+  } catch (error) {
+    console.error('Error mengambil data:', error);
+    return {
+      engineer: "tabawa renki",
+      data: []
+    };
+  }
 }
 
-router.get("/pinterest", async (req, res) => {
-    var apikey = req.query.apikey;
-    var text = req.query.text;
+app.get('/pinterest', (req, res) => {
+  const apikey = req.query.apikey;
+  const text = req.query.text;
 
-    
-    if (!apikey) return res.status(403).json(logsekai.noapikey);
-    if (!text) return res.status(403).json(logsekai.butuhurl);
-    if (!apikeyAuth.includes(apikey)) {
-        return res.status(403).json({ error: 'Invalid API key' });
-    }
+  if (!apikey) return res.status(403).json({ error: 'Butuh Query Apikey' });
+  if (!text) return res.status(403).json({ error: 'Mau Cari Pin Apa?' });
+  if (!apikeyAuth.includes(apikey)) {
+    return res.status(403).json({ error: 'Nggak Ada Apikey Mau Apikey? Contact Developer' });
+  }
 
-    pinterest(text)
-        .then(images => {
-            res.status(200).json({
-                engineering: "Tabawa",
-                data: images
-            });
-        })
-        .catch(error => {
-            console.error('Error in /pinterest endpoint:', error);
-            res.status(500).json({ error: error.message });
-        });
-});
-
+  pinterest(text)
+    .then(images => {
+      res.status(200).json(images);
+    })
+    .catch(error => {
+      console.error('Error in /pinterest endpoint:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    });
+})
 
 router.get("/status", async (req, res) => {
   try {
