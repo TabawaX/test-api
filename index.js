@@ -1,3 +1,4 @@
+
 const express = require("express");
 const cors = require("cors");
 const secure = require("ssl-express-www");
@@ -5,11 +6,23 @@ const path = require("path");
 const app = express();
 const __path = process.cwd();
 
+// Debugging line to check the request object
+app.use((req, res, next) => {
+  console.log(`Request received: ${req.method} ${req.url}`);
+  next();
+});
+
 app.use(express.json());
 app.enable("trust proxy");
 app.set("json spaces", 2);
 app.use(cors());
-app.use(secure());
+
+// Check if secure is being called correctly
+try {
+  app.use(secure);
+} catch (err) {
+  console.error('Error initializing ssl-express-www middleware:', err);
+}
 
 app.use(express.static(path.join(__path, 'public')));
 
@@ -43,7 +56,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-const port = 3000
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
