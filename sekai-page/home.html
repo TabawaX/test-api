@@ -16,7 +16,31 @@
     <!-- Site Title -->
     <title>Sekai Network</title>
     <!-- Inline CSS -->
-    <style>
+    <style> 
+      .modal-dialog-centered {
+            display: flex;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .modal-footer .btn {
+            margin: 5px;
+        }
+        @media (max-width: 576px) {
+            .modal-footer {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .modal-footer .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+        @media (min-width: 577px) {
+            .modal-footer .btn {
+                margin: 10px;
+            }
+        }
       .loader {
         width: 50px;
         aspect-ratio: 1;
@@ -390,7 +414,7 @@
       }
     </style>
   </head>
-  <body>
+<body>
     <div class="loading-screen">
       <div class="loader"></div>
     </div>
@@ -482,22 +506,41 @@
           document.getElementById("currentTime").textContent = formatTime(currentTime);
         });
         window.onload = function() {
-          showNotification();
+          PerlihatkanNotifikasi1();
           setTimeout(function() {
             document.querySelector('.loading-screen').style.display = 'none';
-          }, 15000); // 15000 ms = 15 detik
+          }, 5000);
         };
       </script>
-      <!-- SweetAlert -->
-      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+      <!-- Notifikasi -->
+      <!-- Bootstrap Dan jQuery -->
+      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+      <!-- Modal -->
+      <div class="modal fade" id="NotifikasiModal" tabindex="-1" role="dialog" aria-labelledby="NotifikasiModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="NotifikasiModalLabel">Welcoming Notification</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body text-center">
+              <img src="https://telegra.ph/file/0f3a93cedc784c0d200cf.jpg" alt="Kanade Dan Kawan Kawan" class="img-fluid mb-3">
+              <p>Join our WhatsApp groups for more information and community support!</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+              <button type="button" class="btn btn-primary" onclick="location.href='https://chat.whatsapp.com/CwhyfVBfbydANCTohrBtzk';">Group Whatsapp</button>
+              <button type="button" class="btn btn-secondary" onclick="location.href='https://chat.whatsapp.com/GSkuBCr2IGwEXZ4HwFhzmN';">Community Group</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <script>
-        function showNotification() {
-          Swal.fire({
-            title: 'Selamat Datang Kak!!',
-            html: 'Untuk Informasi Bot Whatsapp Silahkan Kunjungi  < a href = "https://chat.whatsapp.com/CwhyfVBfbydANCTohrBtzk" > Group Whatsapp < /a> < br > Dan Jika Kamu Developer Cobain Rest API\ 's Kami Yuk  < a href = "https://kislana.my.id/api/docs" > Sekai Rest API\ 's</a>.',
-            icon: 'info',
-            confirmButtonText: 'Siap Kak'
-          });
+        function PerlihatkanNotifikasi1() {
+          $('#NotifikasiModal').modal('show');
         }
       </script>
     </center>
