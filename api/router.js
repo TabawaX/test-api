@@ -79,9 +79,9 @@ async function pinterest(query) {
 }
 
 
-router.post('/tiktokdl', async (req, res) => {
-  const apikey = req.body.apikey;
-  const url = req.body.url;
+router.get('/tiktokdl', async (req, res) => {
+  const apikey = req.query.apikey;
+  const url = req.query.url;
 
   if (!apikey) {
     return res.status(logsekai.noapikey.status).json(logsekai.noapikey);
@@ -98,7 +98,7 @@ router.post('/tiktokdl', async (req, res) => {
     const result = await tiktokInstance.slideDownloader(url);
     res.status(200).json(result);
   } catch (error) {
-    console.error('Error in /tiktok endpoint:', error);
+    console.error('Error in /tiktokdl endpoint:', error);
     res.status(logsekai.error.status).json(logsekai.error);
   }
 });
