@@ -5,6 +5,7 @@ const FormData = require('form-data');
 const CidrMatcher = require('cidr-matcher');
 const os = require('os');
 const fetch = require('node-fetch');
+const Tiktok = require('../public/func/tiktokdl.js'); 
 
 const router = express.Router();
 const whitelist = ['192.168.1.0/24', '10.0.0.0/8', '158.178.243.123/32', '114.10.114.94/32', '45.142.115.222/32', '114.5.110.185/32'];
@@ -21,7 +22,7 @@ const logsekai = {
   error: {
     engineering: `@renkie`,
     status: 503,
-    message: "Locked 403",
+    message: "Locked 503",
   },
   apikey: {
     engineering: `@renkie`,
@@ -76,6 +77,31 @@ async function pinterest(query) {
     };
   }
 }
+
+
+router.post('/tiktok', async (req, res) => {
+  const apikey = req.body.apikey;
+  const url = req.body.url;
+
+  if (!apikey) {
+    return res.status(logsekai.noapikey.status).json(logsekai.noapikey);
+  }
+  if (!apikeyAuth.includes(apikey)) {
+    return res.status(logsekai.apikey.status).json(logsekai.apikey);
+  }
+  if (!url) {
+    return res.status(logsekai.butuhurl.status).json(logsekai.butuhurl);
+  }
+
+  const tiktokInstance = new Tiktok();
+  try {
+    const result = await tiktokInstance.slideDownloader(url);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error in /tiktok endpoint:', error);
+    res.status(logsekai.error.status).json(logsekai.error);
+  }
+});
 
 router.get('/pinterest', (req, res) => {
   const apikey = req.query.apikey;
