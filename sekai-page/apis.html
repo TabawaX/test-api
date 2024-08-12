@@ -1,2 +1,98 @@
 <!doctypehtml><html lang=en><meta charset=UTF-8><meta content="width=device-width,initial-scale=1"name=viewport><title>NusaSekai Rest API</title><style>body{font-family:Arial,sans-serif;margin:0;padding:0;background-color:#f4f4f4;display:flex;flex-direction:column;align-items:center;height:100vh;overflow-x:auto}.container{width:80%;max-width:1200px;background:#fff;padding:20px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,.1);margin-top:20px;overflow-x:auto}h1{text-align:center;color:#333}.category{margin-bottom:30px}.category h2{margin:0}.api-box{margin-bottom:20px;padding:15px;border:1px solid #ddd;border-radius:8px;background:#f9f9f9;box-shadow:0 0 5px rgba(0,0,0,.1);cursor:pointer;transition:background .3s,border-color .3s}.api-box.active{background:#fff;border-color:#007bff}.api-box h3{margin-top:0;margin-bottom:10px}.api-box:not(.active) .api-section{display:none}.api-info{margin-bottom:10px;display:flex;align-items:center}.api-info span{display:inline-block;margin-right:10px;font-weight:700}.api-info .status{width:10px;height:10px;border-radius:50%;background-color:#90ee90;display:inline-block;margin-right:10px}.api-key-required{width:20px;height:auto;vertical-align:middle;margin-left:10px}.api-section label{display:block;margin-bottom:5px;font-weight:700}.api-section input[type=text],.api-section select{width:calc(100% - 22px);padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:4px}.api-section button{width:100%;padding:10px;border:none;border-radius:4px;background-color:#007bff;color:#fff;font-size:16px;cursor:pointer;margin-top:10px}.api-section button:hover{background-color:#0056b3}.result{margin-top:20px}.result pre{background-color:#eee;padding:10px;border-radius:4px;white-space:pre-wrap;word-wrap:break-word}.popup{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:300px;padding:20px;background:#fff;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,.2);z-index:1000}.popup input{width:calc(100% - 22px);padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:4px}.popup .button-38{width:100%;margin-top:10px}.button-38{background-color:#bfefff;border:0;border-radius:.5rem;box-sizing:border-box;color:#111827;font-family:"Inter var",ui-sans-serif,system-ui,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:.75rem;font-weight:600;line-height:1rem;padding:.5rem 1rem;text-align:center;box-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px 0 rgba(0,0,0,.06);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}.button-38.unauthorized{background-color:#d41212;color:#fff;border:2px solid #d41212;box-shadow:0 0 8px rgba(212,18,18,.5)}.button-38.authorized{background-color:#28a745;color:#fff;border:2px solid #28a745;box-shadow:0 0 8px rgba(40,167,69,.5)}.button-38.authorized:hover{background-color:#218838}.button-38:hover{background-color:#f9fafb}.button-38:focus{outline:2px solid transparent;outline-offset:2px}.button-38:focus-visible{box-shadow:none}.button-logo{padding:6px 6px;font-size:14px;border-radius:5px;color:#725ac1;background:0 0;cursor:pointer;transition:ease-out .3s;border:1px solid #725ac1;box-shadow:inset 0 0 0 0 #725ac1,0 0 8px rgba(114,90,192,.6);display:flex;align-items:center;justify-content:center;position:relative;top:-10px}.button-logo.unauthorized{color:#d41212;border-color:#d41212;box-shadow:inset 0 0 0 0 #d41212,0 0 8px rgba(212,18,18,.6)}.button-logo.authorized{color:#28a745;border-color:#28a745;box-shadow:inset 0 0 0 0 #28a745,0 0 8px rgba(40,167,69,.6)}.button-logo img{width:24px;height:auto}.button-logo.unauthorized:hover{background:rgba(211,18,18,.1);box-shadow:inset 0 -100px 0 0 #d41212}.button-logo.authorized:hover{background:rgba(40,167,69,.1);box-shadow:inset 0 -100px 0 0 #28a745}#apiKeyInfo{margin-top:10px;padding:10px;background-color:#f9f9f9;border:1px solid #ddd;border-radius:4px;font-family:"Inter var",ui-sans-serif,system-ui,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;color:#333}#currentApiKey{font-family:"Inter var",ui-sans-serif,system-ui,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-weight:700;color:#007bff;word-wrap:break-word}.description{margin-top:5px;margin-bottom:20px;padding:10px;background-color:#fff;border-radius:4px;box-shadow:0 0 5px rgba(0,0,0,.1)}.description p{margin:0}.popup{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:90%;max-width:400px;padding:20px;background:#fff;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,.2);z-index:1000;overflow-y:auto}.popup input{width:calc(100% - 22px);padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:4px}.popup .button-38{width:100%;margin-top:10px}.popup .button-38:hover{background-color:#f9fafb}.popup .button-38:focus{outline:2px solid transparent;outline-offset:2px}.popup .button-38:focus-visible{box-shadow:none}.checkbox-wrapper-35 .switch{display:none}.checkbox-wrapper-35 .switch+label{-webkit-box-align:center;-webkit-align-items:center;-ms-flex-align:center;align-items:center;color:#78768d;cursor:pointer;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:15px;position:relative;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.checkbox-wrapper-35 .switch+label::after,.checkbox-wrapper-35 .switch+label::before{content:'';display:block}.checkbox-wrapper-35 .switch+label::before{background-color:#05012c;border-radius:500px;height:15px;margin-right:8px;-webkit-transition:background-color 125ms ease-out;transition:background-color 125ms ease-out;width:25px}.checkbox-wrapper-35 .switch+label::after{background-color:#fff;border-radius:13px;box-shadow:0 3px 1px 0 rgba(37,34,71,.05),0 2px 2px 0 rgba(37,34,71,.1),0 3px 3px 0 rgba(37,34,71,.05);height:13px;left:1px;position:absolute;top:1px;-webkit-transition:-webkit-transform 125ms ease-out;transition:-webkit-transform 125ms ease-out;transition:transform 125ms ease-out;transition:transform 125ms ease-out,-webkit-transform 125ms ease-out;width:13px}.checkbox-wrapper-35 .switch+label .switch-x-text{display:block;margin-right:.3em}.checkbox-wrapper-35 .switch+label .switch-x-toggletext{display:block;font-weight:700;height:15px;overflow:hidden;position:relative;width:40px}.checkbox-wrapper-35 .switch+label .switch-x-checked,.checkbox-wrapper-35 .switch+label .switch-x-unchecked{left:0;position:absolute;top:0;-webkit-transition:opacity 125ms ease-out,-webkit-transform 125ms ease-out;transition:opacity 125ms ease-out,-webkit-transform 125ms ease-out;transition:transform 125ms ease-out,opacity 125ms ease-out;transition:transform 125ms ease-out,opacity 125ms ease-out,-webkit-transform 125ms ease-out}.checkbox-wrapper-35 .switch+label .switch-x-unchecked{opacity:1;-webkit-transform:none;transform:none}.checkbox-wrapper-35 .switch+label .switch-x-checked{opacity:0;-webkit-transform:translate3d(0,100%,0);transform:translate3d(0,100%,0)}.checkbox-wrapper-35 .switch+label .switch-x-hiddenlabel{position:absolute;visibility:hidden}.checkbox-wrapper-35 .switch:checked+label::before{background-color:#ffb500}.checkbox-wrapper-35 .switch:checked+label::after{-webkit-transform:translate3d(10px,0,0);transform:translate3d(10px,0,0)}.checkbox-wrapper-35 .switch:checked+label .switch-x-unchecked{opacity:0;-webkit-transform:translate3d(0,-100%,0);transform:translate3d(0,-100%,0)}.checkbox-wrapper-35 .switch:checked+label .switch-x-checked{opacity:1;-webkit-transform:none;transform:none}body.dark-mode{background-color:#121212;color:#e0e0e0}body.dark-mode .container{background:#1e1e1e;color:#e0e0e0}body.dark-mode .api-box{background:#2c2c2c;border-color:#444}body.dark-mode .api-info{color:#e0e0e0}body.dark-mode .popup{background:#1e1e1e;color:#e0e0e0}body.dark-mode .description{background-color:#2c2c2c;color:#e0e0e0}body.dark-mode h1{color:#fff}body.dark-mode .api-section input[type=text],body.dark-mode .api-section select{background-color:#333;border-color:#444;color:#e0e0e0}body.dark-mode .api-section button{background-color:#555;color:#e0e0e0}body.dark-mode .api-section button:hover{background-color:#666}body.dark-mode #resultContainer{background-color:#2c2c2c}body.dark-mode #resultOutput{color:#fff;background-color:#1e1e1e;border:1px solid #444;padding:10px}.loader-container{position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;transition:opacity .5s ease}.loader-container.hidden{opacity:0;pointer-events:none}.loader{font-weight:700;font-family:Ubuntu,sans-serif;font-size:20px;color:#0000;background:linear-gradient(90deg,#000 calc(50% - .5ch),#c02942 0 calc(50% + .5ch),#000 0) right/calc(200% + 1ch) 100%;-webkit-background-clip:text;background-clip:text;animation:l8 2s infinite steps(11)}.loading-text{font-size:5px;color:#666;margin-top:10px}.loader:before{content:"NusaSekai API's..."}@keyframes l8{to{background-position:left}}</style><div class=loader-container><div class=loader></div><p class=loading-text>Wait for a moment...</div><div class=container><h1>NusaSekai Rest API</h1><div class=description><p>Welcome to NusaSekai Rest API. Some features may require an API key. You can verify the API key via the red key button if you haven't already.</div><button class="button-logo unauthorized"id=authorizeButton><img alt=Authorize src=https://telegra.ph/file/94853cac358c6421927c6.png id=authorizeLogo></button><div class=checkbox-wrapper-35><input id=switch class=switch name=switch type=checkbox value=private> <label for=switch><span class=switch-x-text>Mode</span> <span class=switch-x-toggletext><span class=switch-x-unchecked><span class=switch-x-hiddenlabel>Unchecked: </span>Light Mode</span> <span class=switch-x-checked><span class=switch-x-hiddenlabel>Checked: </span>Dark Mode</span></span></label></div><div class=category><h2>Searching</h2><div class=api-box id=searchApiBox><h3>Search Pinterest</h3><div class=api-info><div class=status id=pinterestStatus></div><span>GET Method</span> <span>Endpoint: <a href=https://kislana.my.id/api/pinterest target=_blank>/api/pinterest</a></span> <img alt="API Key Required"src=https://telegra.ph/file/0407ec69b25991328bb86.png class=api-key-required></div><div class=api-section><label for=searchInput>Search Term</label> <input id=searchInput placeholder="Enter search term..."> <button class=button-38 id=searchButton>Search</button></div></div></div><div class=category><h2>Api Utility</h2><div class=api-box id=statusApiBox><h3>Status Check</h3><div class=api-info><div class=status id=statusStatus></div><span>GET Method</span> <span>Endpoint: <a href=https://kislana.my.id/api/status target=_blank>/api/status</a></span></div><div class=api-section><button class=button-38 id=statusButton>Check Status</button></div></div></div><div class=result id=resultContainer><h2>Result</h2><pre id=resultOutput></pre></div></div><div class=popup id=popup><label for=apiKeyInput>Enter API Key:</label> <input id=apiKeyInput placeholder="Enter API key..."> <button class=button-38 id=saveApiKey>Authorize</button> <button class=button-38 id=cancelPopup>Cancel</button><div id=apiKeyInfo>Current API Key: <span id=currentApiKey>None</span></div></div><script>let apiKey = '';
-        let activeApiBox = null;  function function fetchData(url, statusId) { fetch(url) .then(response => response.json()) .then(data => { document.getElementById('resultOutput').textContent = JSON.stringify(data, null, 2); document.getElementById(statusId).style.backgroundColor = 'lightgreen'; }) .catch(error => { console.error('Error fetching data:', error); document.getElementById(statusId).style.backgroundColor = 'lightcoral'; document.getElementById('resultOutput').textContent = 'Error fetching data.'; }); } // Button event listeners document.getElementById('searchButton').addEventListener('click', function() { const query = document.getElementById('searchInput').value; if (query.length > 2) { const url = apiKey ? `https://kislana.my.id/api/pinterest?apikey=${apiKey}&text=${query}` : `https://kislana.my.id/api/pinterest?text=${query}`; fetchData(url, 'pinterestStatus'); } else { document.getElementById('resultOutput').textContent = 'Please enter a search term with at least 3 characters.'; } }); document.getElementById('statusButton').addEventListener('click', function() { const url = apiKey ? `https://kislana.my.id/api/status?apikey=${apiKey}` : `https://kislana.my.id/api/status`; fetchData(url, 'statusStatus'); }); document.getElementById('authorizeButton').addEventListener('click', function() { document.getElementById('popup').style.display = 'block'; }); document.getElementById('saveApiKey').addEventListener('click', function() { apiKey = document.getElementById('apiKeyInput').value.trim(); if (apiKey) { document.getElementById('popup').style.display = 'none'; document.getElementById('authorizeButton').classList.remove('unauthorized'); document.getElementById('authorizeButton').classList.add('authorized'); document.getElementById('authorizeLogo').src = 'https://telegra.ph/file/6295af8a64d1fe55986f3.png'; // Update logo when authorized document.getElementById('currentApiKey').textContent = apiKey; // Update the current API key display } else { document.getElementById('apiKeyInput').style.borderColor = '#d41212'; // Red border for invalid input } }); document.getElementById('cancelPopup').addEventListener('click', function() { document.getElementById('popup').style.display = 'none'; }); // Handle interaction with API boxes document.querySelectorAll('.api-box').forEach(box => { box.addEventListener('click', function() { if (activeApiBox) { activeApiBox.classList.remove('active'); } this.classList.add('active'); activeApiBox = this; }); }); // Dark mode toggle document.getElementById('switch').addEventListener('change', function() { document.body.classList.toggle('dark-mode', this.checked); document.querySelector('.container').classList.toggle('dark-mode', this.checked); document.querySelectorAll('.api-box').forEach(box => { box.classList.toggle('dark-mode', this.checked); }); document.querySelectorAll('.popup').forEach(popup => { popup.classList.toggle('dark-mode', this.checked); }); document.querySelectorAll('#apiKeyInfo').forEach(info => { info.classList.toggle('dark-mode', this.checked); }); document.querySelectorAll('.description').forEach(desc => { desc.classList.toggle('dark-mode', this.checked); }) }); // Fungsi untuk menghilangkan loader setelah 5 detik function hideLoader() { const loader = document.querySelector('.loader-container'); setTimeout(() => { loader.classList.add('hidden'); }, 3000); } // Jalankan fungsi hideLoader saat halaman dimuat window.addEventListener('load', hideLoader);
+        let activeApiBox = null;
+
+        // Fetch data function
+        function fetchData(url, statusId) {
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('resultOutput').textContent = JSON.stringify(data, null, 2);
+                    document.getElementById(statusId).style.backgroundColor = 'lightgreen';
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    document.getElementById(statusId).style.backgroundColor = 'lightcoral';
+                    document.getElementById('resultOutput').textContent = 'Error fetching data.';
+                });
+        }
+
+        // Button event listeners
+        document.getElementById('searchButton').addEventListener('click', function() {
+            const query = document.getElementById('searchInput').value;
+            if (query.length > 2) {
+                const url = apiKey 
+                    ? `https://kislana.my.id/api/pinterest?apikey=${apiKey}&text=${query}`
+                    : `https://kislana.my.id/api/pinterest?text=${query}`;
+                fetchData(url, 'pinterestStatus');
+            } else {
+                document.getElementById('resultOutput').textContent = 'Please enter a search term with at least 3 characters.';
+            }
+        });
+
+        document.getElementById('statusButton').addEventListener('click', function() {
+            const url = apiKey 
+                ? `https://kislana.my.id/api/status?apikey=${apiKey}`
+                : `https://kislana.my.id/api/status`;
+            fetchData(url, 'statusStatus');
+        });
+
+        document.getElementById('authorizeButton').addEventListener('click', function() {
+            document.getElementById('popup').style.display = 'block';
+        });
+
+        document.getElementById('saveApiKey').addEventListener('click', function() {
+            apiKey = document.getElementById('apiKeyInput').value.trim();
+            if (apiKey) {
+                document.getElementById('popup').style.display = 'none';
+                document.getElementById('authorizeButton').classList.remove('unauthorized');
+                document.getElementById('authorizeButton').classList.add('authorized');
+                document.getElementById('authorizeLogo').src = 'https://telegra.ph/file/6295af8a64d1fe55986f3.png'; // Update logo when authorized
+                document.getElementById('currentApiKey').textContent = apiKey; // Update the current API key display
+            } else {
+                document.getElementById('apiKeyInput').style.borderColor = '#d41212'; // Red border for invalid input
+            }
+        });
+
+        document.getElementById('cancelPopup').addEventListener('click', function() {
+            document.getElementById('popup').style.display = 'none';
+        });
+
+        // Handle interaction with API boxes
+        document.querySelectorAll('.api-box').forEach(box => {
+            box.addEventListener('click', function() {
+                if (activeApiBox) {
+                    activeApiBox.classList.remove('active');
+                }
+                this.classList.add('active');
+                activeApiBox = this;
+            });
+        });
+
+        // Dark mode toggle
+        document.getElementById('switch').addEventListener('change', function() {
+            document.body.classList.toggle('dark-mode', this.checked);
+            document.querySelector('.container').classList.toggle('dark-mode', this.checked);
+            document.querySelectorAll('.api-box').forEach(box => {
+                box.classList.toggle('dark-mode', this.checked);
+            });
+            document.querySelectorAll('.popup').forEach(popup => {
+                popup.classList.toggle('dark-mode', this.checked);
+            });
+            document.querySelectorAll('#apiKeyInfo').forEach(info => {
+                info.classList.toggle('dark-mode', this.checked);
+            });
+            document.querySelectorAll('.description').forEach(desc => {
+                desc.classList.toggle('dark-mode', this.checked);
+            })
+        });
+        
+          // Fungsi untuk menghilangkan loader setelah 5 detik
+    function hideLoader() {
+        const loader = document.querySelector('.loader-container');
+        setTimeout(() => {
+            loader.classList.add('hidden');
+        }, 3000); 
+    }
+
+    // Jalankan fungsi hideLoader saat halaman dimuat
+    window.addEventListener('load', hideLoader);</script>
