@@ -79,7 +79,7 @@ async function pinterest(query) {
 }
 
 
-router.post('/tiktok', async (req, res) => {
+router.post('/tiktokdl', async (req, res) => {
   const apikey = req.body.apikey;
   const url = req.body.url;
 
