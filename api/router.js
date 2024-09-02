@@ -95,12 +95,14 @@ router.get('/playstore', async (req, res) => {
         return res.status(400).json({ error: 'API key and search query are required.' });
     }
 
-    try {
-        const results = await PlayStore(search);
-        res.json(results);
-    } catch (error) {
-        res.status(500).json({ error: 'Something went wrong.' });
-    }
+        PlayStore(search)
+      .then(result => {
+      res.status(200).json(result);
+    })
+        .catch(error => {
+      console.error('Error in /pinterest endpoint:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    })
 })
 router.get('/pinterest', (req, res) => {
   const apikey = req.query.apikey;
@@ -120,7 +122,7 @@ router.get('/pinterest', (req, res) => {
       console.error('Error in /pinterest endpoint:', error);
       res.status(500).json({ error: 'Internal Server Error' });
     });
-});
+})
 
 router.get("/status", async (req, res) => {
   try {
