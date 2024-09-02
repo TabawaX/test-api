@@ -5,6 +5,7 @@ const FormData = require('form-data');
 const CidrMatcher = require('cidr-matcher');
 const os = require('os');
 const fetch = require('node-fetch');
+const PlayStore = require('../public/func/playstore');
 
 const router = express.Router();
 const whitelist = ['192.168.1.0/24', '10.0.0.0/8', '158.178.243.123/32', '114.10.114.94/32', '45.142.115.222/32', '114.5.110.185/32'];
@@ -34,6 +35,7 @@ const logsekai = {
     message: "I Need a URL!",
   },
 };
+
 
 async function pinterest(query) {
   const baseUrl = 'https://www.pinterest.com/resource/BaseSearchResource/get/';
@@ -78,73 +80,28 @@ async function pinterest(query) {
 }
 
 
-class Tiktok {
-  constructor() {}
+/**
+ * REST API endpoint to get PlayStore search results.
+ * 
+ * @param {string} apikey - API key for authentication.
+ * @param {string} search - Search query for PlayStore.
+ * @returns {Object} - JSON response containing search results or error message.
+ */
+router.get('/playstore', async (req, res) => {
+    const apikey = req.query.apikey;
+    const search = req.query.search;
 
-  async slideDownloader(url) {
-    try {
-      const response = await axios.post(
-        'https://ttsave.app/download',
-        {
-          query: url,
-          language_id: '2'
-        },
-        {
-          headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      const html = response.data;
-      const $ = cheerio.load(html);
-
-      const download = [];
-      $('a[onclick="bdl(this, event)"]').each((i, elem) => {
-        const link = $(elem).attr('href');
-        const type = $(elem).attr('type');
-        const title = $(elem).text().trim();
-        download.push({ link, type, title });
-      });
-
-      return {
-        engineer: "tabawa renki",
-        data: download
-      };
-    } catch (error) {
-      console.error('Error in slideDownloader:', error);
-      throw error;
+    if (!apikey || !search) {
+        return res.status(400).json({ error: 'API key and search query are required.' });
     }
-  }
-}
 
-router.get('/tiktokdl', (req, res) => {
-  const apikey = req.query.apikey;
-  const url = req.query.url;
-
-  if (!apikey) {
-    return res.status(logsekai.noapikey.status).json(logsekai.noapikey);
-  }
-  if (!apikeyAuth.includes(apikey)) {
-    return res.status(logsekai.apikey.status).json(logsekai.apikey);
-  }
-  if (!url) {
-    return res.status(logsekai.butuhurl.status).json(logsekai.butuhurl);
-  }
-
-  const tiktokInstance = new Tiktok();
-
-  tiktokInstance.slideDownloader(url)
-    .then(result => {
-      res.status(200).json(result);
-    })
-    .catch(error => {
-      console.error('Error in /tiktokdl endpoint:', error);
-      res.status(logsekai.error.status).json(logsekai.error);
-    });
-});
-
+    try {
+        const results = await PlayStore(search);
+        res.json(results);
+    } catch (error) {
+        res.status(500).json({ error: 'Something went wrong.' });
+    }
+})
 router.get('/pinterest', (req, res) => {
   const apikey = req.query.apikey;
   const text = req.query.text;
