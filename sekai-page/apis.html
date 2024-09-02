@@ -11,7 +11,7 @@
 <body> 
     <div class="loader-container">
         <div class="loader"></div>
-         <p class="loading-text">Wait for a moment...</p> 
+        <p class="loading-text">Wait for a moment...</p> 
     </div>
     <div class="container">
         <h1>NusaSekai Rest API</h1>
@@ -22,8 +22,8 @@
         <button id="authorizeButton" class="button-logo unauthorized">
             <img id="authorizeLogo" src="https://telegra.ph/file/94853cac358c6421927c6.png" alt="Authorize">
         </button>
-    
-   <!-- Switch for Dark Mode -->
+
+        <!-- Switch for Dark Mode -->
         <div class="checkbox-wrapper-35">
             <input value="private" name="switch" id="switch" type="checkbox" class="switch">
             <label for="switch">
@@ -34,12 +34,28 @@
                 </span>
             </label>
         </div>
-        
-
 
         <!-- Category: Search -->
         <div class="category">
             <h2>Searching</h2>
+
+            <!-- PlayStore Search Section -->
+            <div class="api-box" id="playstoreApiBox">
+                <h3>Search PlayStore</h3>
+                <div class="api-info">
+                    <div id="playstoreStatus" class="status"></div>
+                    <span>GET Method</span>
+                    <span>Endpoint: <a href="https://kislana.my.id/api/playstore" target="_blank">/api/playstore</a></span>
+                    <img src="https://telegra.ph/file/0407ec69b25991328bb86.png" alt="API Key Required" class="api-key-required">
+                </div>
+                <div class="api-section">
+                    <label for="playstoreInput">Search Term</label>
+                    <input type="text" id="playstoreInput" placeholder="Enter search term...">
+                    <button id="playstoreButton" class="button-38">Search</button>
+                </div>
+            </div>
+
+            <!-- Pinterest Search Section -->
             <div class="api-box" id="searchApiBox">
                 <h3>Search Pinterest</h3>
                 <div class="api-info">
@@ -72,9 +88,11 @@
             </div>
         </div>
 
+        <!-- Result Section -->
         <div class="result" id="resultContainer">
             <h2>Result</h2>
             <pre id="resultOutput"></pre>
+            <button id="copyButton" class="button-38">Copy Result</button>
         </div>
     </div>
 
@@ -87,96 +105,108 @@
         <div id="apiKeyInfo">Current API Key: <span id="currentApiKey">None</span></div>
     </div>
 
-    <script>
-        let apiKey = '';
-        let activeApiBox = null;
+<script>
+    let apiKey = '';
+    let activeApiBox = null;
 
-        // Fetch data function
-        function fetchData(url, statusId) {
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('resultOutput').textContent = JSON.stringify(data, null, 2);
-                    document.getElementById(statusId).style.backgroundColor = 'lightgreen';
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    document.getElementById(statusId).style.backgroundColor = 'lightcoral';
-                    document.getElementById('resultOutput').textContent = 'Error fetching data.';
-                });
-        }
-
-        // Button event listeners
-        document.getElementById('searchButton').addEventListener('click', function() {
-            const query = document.getElementById('searchInput').value;
-            if (query.length > 2) {
-                const url = apiKey 
-                    ? `https://kislana.my.id/api/pinterest?apikey=${apiKey}&text=${query}`
-                    : `https://kislana.my.id/api/pinterest?text=${query}`;
-                fetchData(url, 'pinterestStatus');
-            } else {
-                document.getElementById('resultOutput').textContent = 'Please enter a search term with at least 3 characters.';
-            }
-        });
-
-        document.getElementById('statusButton').addEventListener('click', function() {
-            const url = apiKey 
-                ? `https://kislana.my.id/api/status?apikey=${apiKey}`
-                : `https://kislana.my.id/api/status`;
-            fetchData(url, 'statusStatus');
-        });
-
-        document.getElementById('authorizeButton').addEventListener('click', function() {
-            document.getElementById('popup').style.display = 'block';
-        });
-
-        document.getElementById('saveApiKey').addEventListener('click', function() {
-            apiKey = document.getElementById('apiKeyInput').value.trim();
-            if (apiKey) {
-                document.getElementById('popup').style.display = 'none';
-                document.getElementById('authorizeButton').classList.remove('unauthorized');
-                document.getElementById('authorizeButton').classList.add('authorized');
-                document.getElementById('authorizeLogo').src = 'https://telegra.ph/file/6295af8a64d1fe55986f3.png'; // Update logo when authorized
-                document.getElementById('currentApiKey').textContent = apiKey; // Update the current API key display
-            } else {
-                document.getElementById('apiKeyInput').style.borderColor = '#d41212'; // Red border for invalid input
-            }
-        });
-
-        document.getElementById('cancelPopup').addEventListener('click', function() {
-            document.getElementById('popup').style.display = 'none';
-        });
-
-        // Handle interaction with API boxes
-        document.querySelectorAll('.api-box').forEach(box => {
-            box.addEventListener('click', function() {
-                if (activeApiBox) {
-                    activeApiBox.classList.remove('active');
-                }
-                this.classList.add('active');
-                activeApiBox = this;
-            });
-        });
-
-        // Dark mode toggle
-        document.getElementById('switch').addEventListener('change', function() {
-            document.body.classList.toggle('dark-mode', this.checked);
-            document.querySelector('.container').classList.toggle('dark-mode', this.checked);
-            document.querySelectorAll('.api-box').forEach(box => {
-                box.classList.toggle('dark-mode', this.checked);
-            });
-            document.querySelectorAll('.popup').forEach(popup => {
-                popup.classList.toggle('dark-mode', this.checked);
-            });
-            document.querySelectorAll('#apiKeyInfo').forEach(info => {
-                info.classList.toggle('dark-mode', this.checked);
-            });
-            document.querySelectorAll('.description').forEach(desc => {
-                desc.classList.toggle('dark-mode', this.checked);
+    // Fetch data function
+    function fetchData(url, statusId) {
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('resultOutput').textContent = JSON.stringify(data, null, 2);
+                document.getElementById(statusId).style.backgroundColor = 'lightgreen';
             })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                document.getElementById(statusId).style.backgroundColor = 'lightcoral';
+                document.getElementById('resultOutput').textContent = 'Error fetching data.';
+            });
+    }
+
+    // Button event listeners
+    document.getElementById('searchButton').addEventListener('click', function() {
+        const query = document.getElementById('searchInput').value;
+        if (query.length > 2) {
+            const url = apiKey 
+                ? `https://kislana.my.id/api/pinterest?apikey=${apiKey}&text=${query}`
+                : `https://kislana.my.id/api/pinterest?text=${query}`;
+            fetchData(url, 'pinterestStatus');
+        } else {
+            document.getElementById('resultOutput').textContent = 'Please enter a search term with at least 3 characters.';
+        }
+    });
+
+    document.getElementById('playstoreButton').addEventListener('click', function() {
+        const query = document.getElementById('playstoreInput').value;
+        if (query.length > 2) {
+            const url = apiKey 
+                ? `https://kislana.my.id/api/playstore?apikey=${apiKey}&search=${query}`
+                : `https://kislana.my.id/api/playstore?search=${query}`;
+            fetchData(url, 'playstoreStatus');
+        } else {
+            document.getElementById('resultOutput').textContent = 'Please enter a search term with at least 3 characters.';
+        }
+    });
+
+    document.getElementById('statusButton').addEventListener('click', function() {
+        const url = apiKey 
+            ? `https://kislana.my.id/api/status?apikey=${apiKey}`
+            : `https://kislana.my.id/api/status`;
+        fetchData(url, 'statusStatus');
+    });
+
+    document.getElementById('authorizeButton').addEventListener('click', function() {
+        document.getElementById('popup').style.display = 'block';
+    });
+
+    document.getElementById('saveApiKey').addEventListener('click', function() {
+        apiKey = document.getElementById('apiKeyInput').value.trim();
+        if (apiKey) {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('authorizeButton').classList.remove('unauthorized');
+            document.getElementById('authorizeButton').classList.add('authorized');
+            document.getElementById('authorizeLogo').src = 'https://telegra.ph/file/6295af8a64d1fe55986f3.png'; // Update logo when authorized
+            document.getElementById('currentApiKey').textContent = apiKey; // Update the current API key display
+        } else {
+            document.getElementById('apiKeyInput').style.borderColor = '#d41212'; // Red border for invalid input
+        }
+    });
+
+    document.getElementById('cancelPopup').addEventListener('click', function() {
+        document.getElementById('popup').style.display = 'none';
+    });
+
+    // Handle interaction with API boxes
+    document.querySelectorAll('.api-box').forEach(box => {
+        box.addEventListener('click', function() {
+            if (activeApiBox) {
+                activeApiBox.classList.remove('active');
+            }
+            this.classList.add('active');
+            activeApiBox = this;
         });
-        
-          // Fungsi untuk menghilangkan loader setelah 5 detik
+    });
+
+    // Dark mode toggle
+    document.getElementById('switch').addEventListener('change', function() {
+        document.body.classList.toggle('dark-mode', this.checked);
+        document.querySelector('.container').classList.toggle('dark-mode', this.checked);
+        document.querySelectorAll('.api-box').forEach(box => {
+            box.classList.toggle('dark-mode', this.checked);
+        });
+        document.querySelectorAll('.popup').forEach(popup => {
+            popup.classList.toggle('dark-mode', this.checked);
+        });
+        document.querySelectorAll('#apiKeyInfo').forEach(info => {
+            info.classList.toggle('dark-mode', this.checked);
+        });
+        document.querySelectorAll('.description').forEach(desc => {
+            desc.classList.toggle('dark-mode', this.checked);
+        })
+    });
+
+    // Fungsi untuk menghilangkan loader setelah 3 detik
     function hideLoader() {
         const loader = document.querySelector('.loader-container');
         setTimeout(() => {
@@ -186,5 +216,24 @@
 
     // Jalankan fungsi hideLoader saat halaman dimuat
     window.addEventListener('load', hideLoader);
-    </script>
+
+    // Tambahkan tombol salin hasil JSON
+    const resultContainer = document.getElementById('resultContainer');
+    const copyButton = document.createElement('button');
+    copyButton.textContent = 'Copy JSON';
+    copyButton.classList.add('button-38');  // Menambahkan kelas yang sama dengan tombol lainnya
+    resultContainer.appendChild(copyButton);
+
+    copyButton.addEventListener('click', () => {
+        const resultText = document.getElementById('resultOutput').textContent;
+        navigator.clipboard.writeText(resultText)
+            .then(() => {
+                alert('JSON berhasil disalin ke clipboard!');
+            })
+            .catch(err => {
+                console.error('Error copying JSON:', err);
+                alert('Gagal menyalin JSON.');
+            });
+    });
+</script>
 </body>
