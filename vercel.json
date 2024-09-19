@@ -10,6 +10,9 @@
     { "src": "/api/(.*)", "dest": "index.js" },
     { "src": "/api-docs", "dest": "index.js" },
     { "src": "/docs", "dest": "index.js" },
+    { "src": "/grup", "dest": "index.js" },
+    { "src": "/telegram", "dest": "index.js" },
+    { "src": "/discord", "dest": "index.js" },
     { "src": "/", "dest": "index.js" },
     { "src": "/(.*)", "dest": "index.js" }
   ]
