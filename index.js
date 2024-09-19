@@ -46,9 +46,20 @@ app.get("/api-docs", (req, res) => {
   res.sendFile(path.join(__path, "sekai-page", "apis.html"));
 });
 
-const router = require('./api/router');
-app.use('/api', router);
+// Direct routing for WhatsApp, Telegram, and Discord
+app.get('/grup', (req, res) => {
+  res.redirect('https://chat.whatsapp.com/CwhyfVBfbydANCTohrBtzk');
+});
 
+app.get('/telegram', (req, res) => {
+  res.redirect('https://t.me/nusantaku');
+});
+
+app.get('/discord', (req, res) => {
+  res.redirect('https://discord.com/invite/B9n6EqTjkr');
+});
+
+// Handle 404 errors
 app.use((req, res, next) => {
   res.status(404).json({ 
     engineer: "@Tabawa",
@@ -56,6 +67,7 @@ app.use((req, res, next) => {
   });
 });
 
+// Handle 500 errors
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
