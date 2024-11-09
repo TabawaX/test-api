@@ -47,7 +47,7 @@ app.get("/api-docs", (req, res) => {
 });
 
 app.get('/grup', (req, res) => {
-  res.redirect('https://chat.whatsapp.com/CwhyfVBfbydANCTohrBtzk');
+  res.redirect('https://chat.whatsapp.com/Ih0I3APRyw59SDhHkFundY');
 });
 
 app.get('/telegram', (req, res) => {
