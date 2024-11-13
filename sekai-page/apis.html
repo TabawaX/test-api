@@ -312,5 +312,20 @@
                 alert('Failed to copy JSON.')
             })
     })
+    
+    document.getElementById('bratButton').addEventListener('click', function() {
+    const query = document.getElementById('bratInput').value
+    if (query.length > 2) {
+        // Construct the URL for direct redirection
+        const url = apiKey 
+            ? `https://kislana.my.id/api/brat?apikey=${apiKey}&text=${query}`
+            : `https://kislana.my.id/api/brat?text=${query}`
+        
+        // Redirect to the generated URL
+        window.location.href = url
+    } else {
+        document.getElementById('resultOutput').textContent = 'Please enter text with at least 3 characters.'
+    }
+})
 </script>
 </body>
