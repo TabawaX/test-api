@@ -318,7 +318,7 @@
     if (query.length > 2) {
         // Construct the URL for direct redirection
         const url = apiKey 
-            ? `https://kislana.my.id/api/brat?apikey=${apiKey}&text=${query}`
+            ? `https://kislana.my.id/api/brat?apikey=${apiKey}&query=${query}`
             : `https://kislana.my.id/api/brat?query=${query}`
         
         // Redirect to the generated URL
