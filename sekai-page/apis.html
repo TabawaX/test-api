@@ -319,7 +319,7 @@
         // Construct the URL for direct redirection
         const url = apiKey 
             ? `https://kislana.my.id/api/brat?apikey=${apiKey}&text=${query}`
-            : `https://kislana.my.id/api/brat?text=${query}`
+            : `https://kislana.my.id/api/brat?query=${query}`
         
         // Redirect to the generated URL
         window.location.href = url
