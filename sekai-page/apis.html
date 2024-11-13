@@ -34,6 +34,27 @@
                 </span>
             </label>
         </div>
+        
+        <!-- Category: Fun -->
+<div class="category">
+    <h2>Fun</h2>
+
+    <!-- Brat API Section -->
+    <div class="api-box" id="bratApiBox">
+        <h3>Brat API</h3>
+        <div class="api-info">
+            <div id="bratStatus" class="status"></div>
+            <span>GET Method</span>
+            <span>Endpoint: <a href="https://kislana.my.id/api/brat" target="_blank">/api/brat</a></span>
+            <img src="https://telegra.ph/file/0407ec69b25991328bb86.png" alt="API Key Required" class="api-key-required">
+        </div>
+        <div class="api-section">
+            <label for="bratInput">Text</label>
+            <input type="text" id="bratInput" placeholder="Enter text to generate image...">
+            <button id="bratButton" class="button-38">Generate Image</button>
+        </div>
+    </div>
+</div>
 
         <!-- Category: Search -->
         <div class="category">
@@ -235,5 +256,18 @@
                 alert('Gagal menyalin JSON.');
             });
     });
+    
+    document.getElementById('bratButton').addEventListener('click', function() {
+    const text = document.getElementById('bratInput').value;
+    if (text.length > 2) {
+        const url = apiKey 
+            ? `https://kislana.my.id/api/brat?apikey=${apiKey}&query=${encodeURIComponent(text)}`
+            : `https://kislana.my.id/api/brat?query=${encodeURIComponent(text)}`;
+        
+        fetchData(url, 'bratStatus');
+    } else {
+        document.getElementById('resultOutput').textContent = 'Please enter a text with at least 3 characters.';
+    }
+});
 </script>
 </body>
