@@ -79,6 +79,36 @@ async function pinterest(query) {
   }
 }
 
+router.get('/brat', async (req, res) => {
+    const apikey = req.query.apikey;
+    const search = req.query.query
+
+    if (!apikey || !search) {
+        return res.status(400).json({ error: 'API key and search query are required.' });
+    }
+
+    try {
+        // Membuat URL dengan query yang dimasukkan
+        const imageUrl = `https://mxmxk-helper.hf.space/brat?text=${encodeURIComponent(search)}`;
+
+        // Mendapatkan gambar dari URL
+        const response = await fetch(imageUrl);
+        
+        if (!response.ok) {
+            return res.status(500).json({ error: 'Failed to fetch image from the source.' });
+        }
+
+        // Mengambil gambar dalam bentuk buffer
+        const buffer = await response.buffer();
+
+        // Mengirim gambar langsung sebagai response
+        res.set('Content-Type', 'image/png');  // Atur header agar ini diperlakukan sebagai gambar PNG
+        res.status(200).send(buffer);  // Mengirimkan buffer gambar
+    } catch (error) {
+        console.error('Error in /brat endpoint:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 /**
  * REST API endpoint to get PlayStore search results.
