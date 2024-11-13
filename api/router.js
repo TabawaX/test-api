@@ -86,6 +86,11 @@ router.get('/brat', async (req, res) => {
     if (!apikey || !search) {
         return res.status(400).json({ error: 'API key and search query are required.' });
     }
+    
+    if (!apikeyAuth.includes(apikey)) {
+    return res.status(403).json({ error: 'Nggak Ada Apikey Mau Apikey? Contact Developer' });
+  }
+
 
     try {
         // Membuat URL dengan query yang dimasukkan
@@ -124,6 +129,11 @@ router.get('/playstore', async (req, res) => {
     if (!apikey || !search) {
         return res.status(400).json({ error: 'API key and search query are required.' });
     }
+    
+    if (!apikeyAuth.includes(apikey)) {
+    return res.status(403).json({ error: 'Nggak Ada Apikey Mau Apikey? Contact Developer' });
+  }
+
 
         PlayStore(search)
       .then(result => {
