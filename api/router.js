@@ -40,7 +40,7 @@ const logsekai = {
         status: 403,
         message: "Query nya mana?!",
     },
-};'
+};
 
 async function pinterest(query) {
   const baseUrl = 'https://www.pinterest.com/resource/BaseSearchResource/get/';
@@ -84,15 +84,14 @@ async function pinterest(query) {
   }
 }
 
-
 router.post('/zerochan', async (req, res) => {
     const { apiKey, query, pages } = req.body;
 
-    if (!apiKey || apiKey !== apikeyAuth) {
-        return res.status(logsekai.noapikey).json(logsekai.noapikey);
+    if (!apiKey || !apikeyAuth.includes(apiKey)) {
+        return res.status(logsekai.noapikey.status).json(logsekai.noapikey);
     }
     if (!query) {
-        return res.status(logsekai.butuhq).json(logsekai.butuhurl);
+        return res.status(logsekai.butuhq.status).json(logsekai.butuhurl);
     }
 
     const pageNumbers = pages ? pages.split(',').map(Number) : [];
@@ -119,50 +118,35 @@ router.post('/zerochan', async (req, res) => {
     }
 });
 
-
 router.get('/brat', async (req, res) => {
     const apikey = req.query.apikey;
-    const search = req.query.query
+    const search = req.query.query;
 
     if (!apikey || !search) {
         return res.status(400).json({ error: 'API key and search query are required.' });
     }
-    
-    if (!apikeyAuth.includes(apikey)) {
-    return res.status(403).json({ error: 'Nggak Ada Apikey Mau Apikey? Contact Developer' });
-  }
 
+    if (!apikeyAuth.includes(apikey)) {
+        return res.status(403).json({ error: 'Nggak Ada Apikey Mau Apikey? Contact Developer' });
+    }
 
     try {
-        // Membuat URL dengan query yang dimasukkan
         const imageUrl = `https://mxmxk-helper.hf.space/brat?text=${encodeURIComponent(search)}`;
-
-        // Mendapatkan gambar dari URL
         const response = await fetch(imageUrl);
         
         if (!response.ok) {
             return res.status(500).json({ error: 'Failed to fetch image from the source.' });
         }
 
-        // Mengambil gambar dalam bentuk buffer
         const buffer = await response.buffer();
-
-        // Mengirim gambar langsung sebagai response
-        res.set('Content-Type', 'image/png');  // Atur header agar ini diperlakukan sebagai gambar PNG
-        res.status(200).send(buffer);  // Mengirimkan buffer gambar
+        res.set('Content-Type', 'image/png');
+        res.status(200).send(buffer);
     } catch (error) {
         console.error('Error in /brat endpoint:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-/**
- * REST API endpoint to get PlayStore search results.
- * 
- * @param {string} apikey - API key for authentication.
- * @param {string} search - Search query for PlayStore.
- * @returns {Object} - JSON response containing search results or error message.
- */
 router.get('/playstore', async (req, res) => {
     const apikey = req.query.apikey;
     const search = req.query.search;
@@ -170,87 +154,86 @@ router.get('/playstore', async (req, res) => {
     if (!apikey || !search) {
         return res.status(400).json({ error: 'API key and search query are required.' });
     }
-    
+
     if (!apikeyAuth.includes(apikey)) {
-    return res.status(403).json({ error: 'Nggak Ada Apikey Mau Apikey? Contact Developer' });
-  }
+        return res.status(403).json({ error: 'Nggak Ada Apikey Mau Apikey? Contact Developer' });
+    }
 
+    try {
+        const result = await PlayStore(search);
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error in /playstore endpoint:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
-        PlayStore(search)
-      .then(result => {
-      res.status(200).json(result);
-    })
-        .catch(error => {
-      console.error('Error in /pinterest endpoint:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    })
-})
 router.get('/pinterest', (req, res) => {
-  const apikey = req.query.apikey;
-  const text = req.query.text;
+    const apikey = req.query.apikey;
+    const text = req.query.text;
 
-  if (!apikey) return res.status(403).json({ error: 'Butuh Query Apikey' });
-  if (!text) return res.status(403).json({ error: 'Mau Cari Pin Apa?' });
-  if (!apikeyAuth.includes(apikey)) {
-    return res.status(403).json({ error: 'Nggak Ada Apikey Mau Apikey? Contact Developer' });
-  }
+    if (!apikey) return res.status(403).json({ error: 'Butuh Query Apikey' });
+    if (!text) return res.status(403).json({ error: 'Mau Cari Pin Apa?' });
+    if (!apikeyAuth.includes(apikey)) {
+        return res.status(403).json({ error: 'Nggak Ada Apikey Mau Apikey? Contact Developer' });
+    }
 
-  pinterest(text)
-    .then(images => {
-      res.status(200).json(images);
-    })
-    .catch(error => {
-      console.error('Error in /pinterest endpoint:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    });
-})
+    pinterest(text)
+        .then(images => {
+            res.status(200).json(images);
+        })
+        .catch(error => {
+            console.error('Error in /pinterest endpoint:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
 
 router.get("/status", async (req, res) => {
-  try {
-    const date = new Date();
-    const jam = date.getHours();
-    const menit = date.getMinutes();
-    const detik = date.getSeconds();
-    const ram = `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${Math.round(os.totalmem() / 1024 / 1024)}MB`;
-    const cpu = os.cpus();
-    const json = await (await fetch("https://api.ipify.org/?format=json")).json();
-    const status = {
-      status: "online",
-      memory: ram,
-      cpu: cpu[0].model,
-      ip: json.ip,
-      time: `${jam}:${menit}:${detik}`,
-      uptime: `${Math.floor(process.uptime() / 3600)}h ${Math.floor((process.uptime() % 3600) / 60)}m ${Math.floor(process.uptime() % 60)}s`,
-      info: {
-        developer: "Renkie",
-        apikey: "tabawayoisaki",
-      },
-    };
-    res.json(status);
-  } catch (error) {
-    console.error('Error in /status route:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
+    try {
+        const date = new Date();
+        const jam = date.getHours();
+        const menit = date.getMinutes();
+        const detik = date.getSeconds();
+        const ram = `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${Math.round(os.totalmem() / 1024 / 1024)}MB`;
+        const cpu = os.cpus();
+        const json = await (await fetch("https://api.ipify.org/?format=json")).json();
+        const status = {
+            status: "online",
+            memory: ram,
+            cpu: cpu[0].model,
+            ip: json.ip,
+            time: `${jam}:${menit}:${detik}`,
+            uptime: `${Math.floor(process.uptime() / 3600)}h ${Math.floor((process.uptime() % 3600) / 60)}m ${Math.floor(process.uptime() % 60)}s`,
+            info: {
+                developer: "Renkie",
+                apikey: "tabawayoisaki",
+            },
+        };
+        res.json(status);
+    } catch (error) {
+        console.error('Error in /status route:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
 });
 
 router.get("/ip", (req, res) => {
-  const ipPengunjung = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const ipPengunjung = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-  if (matcher.contains(ipPengunjung)) {
-    res.status(200).json({
-      status: "200",
-      developer: "@li zhuanxie",
-      ip: ipPengunjung,
-      message: 'Authorized'
-    });
-  } else {
-    res.status(403).json({
-      status: "403",
-      developer: "@li zhuanxie",
-      ip: ipPengunjung,
-      message: 'Not authorized' 
-    });
-  }
+    if (matcher.contains(ipPengunjung)) {
+        res.status(200).json({
+            status: "200",
+            developer: "@li zhuanxie",
+            ip: ipPengunjung,
+            message: 'Authorized'
+        });
+    } else {
+        res.status(403).json({
+            status: "403",
+            developer: "@li zhuanxie",
+            ip: ipPengunjung,
+            message: 'Not authorized' 
+        });
+    }
 });
 
 module.exports = router;
