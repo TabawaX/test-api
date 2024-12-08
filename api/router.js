@@ -6,6 +6,7 @@ const CidrMatcher = require('cidr-matcher');
 const os = require('os');
 const fetch = require('node-fetch');
 const PlayStore = require('../public/func/playstore');
+const ZerochanScraper = require('../public/func/ZerochanScraper'); 
 
 const router = express.Router();
 const whitelist = ['192.168.1.0/24', '10.0.0.0/8', '158.178.243.123/32', '114.10.114.94/32', '45.142.115.222/32', '114.5.110.185/32'];
@@ -14,28 +15,32 @@ const matcher = new CidrMatcher(whitelist);
 const apikeyAuth = ['tabawayoisaki'];
 
 const logsekai = {
-  noapikey: {
-    engineering: `@renkie`,
-    status: 403,
-    message: "Need Apikey? Contact Developer",
-  },
-  error: {
-    engineering: `@renkie`,
-    status: 503,
-    message: "Locked 503",
-  },
-  apikey: {
-    engineering: `@renkie`,
-    status: 403,
-    message: "Butuh Apikey? Contact Developer",
-  },
-  butuhurl: {
-    engineering: `@renkie`,
-    status: 403,
-    message: "I Need a URL!",
-  },
-};
-
+    noapikey: {
+        engineering: `@li zhuanxie`,
+        status: 403,
+        message: "Need Apikey? Contact Developer",
+    },
+    error: {
+        engineering: `@li zhuanxie`,
+        status: 503,
+        message: "Locked 503",
+    },
+    apikey: {
+        engineering: `@li zhuanxie`,
+        status: 403,
+        message: "Butuh Apikey? Contact Developer",
+    },
+    butuhurl: {
+        engineering: `@li zhuanxie`,
+        status: 403,
+        message: "I Need a URL!",
+    },
+    butuhq: {
+        engineering: `@li zhuanxie`,
+        status: 403,
+        message: "Query nya mana?!",
+    },
+};'
 
 async function pinterest(query) {
   const baseUrl = 'https://www.pinterest.com/resource/BaseSearchResource/get/';
@@ -78,6 +83,42 @@ async function pinterest(query) {
     };
   }
 }
+
+
+router.post('/zerochan', async (req, res) => {
+    const { apiKey, query, pages } = req.body;
+
+    if (!apiKey || apiKey !== validApiKey) {
+        return res.status(logsekai.noapikey).json(logsekai.noapikey);
+    }
+    if (!query) {
+        return res.status(logsekai.butuhq).json(logsekai.butuhurl);
+    }
+
+    const pageNumbers = pages ? pages.split(',').map(Number) : [];
+    if (pageNumbers.length === 0) {
+        return res.status(400).json({ error: 'Pages parameter tidak valid atau kosong' });
+    }
+
+    try {
+        const scraper = new ZerochanScraper(query, pageNumbers);
+        const results = await scraper.scrapeAllDetails();
+
+        if (results.status === 'success') {
+            return res.json(results);
+        } else {
+            return res.status(logsekai.error.status).json(logsekai.error);
+        }
+    } catch (error) {
+        console.error('Error saat scraping:', error);
+        return res.status(500).json({
+            status: 'error',
+            message: 'Beritahu Dev Soal eror ini',
+            details: error.message,
+        });
+    }
+});
+
 
 router.get('/brat', async (req, res) => {
     const apikey = req.query.apikey;
@@ -198,14 +239,14 @@ router.get("/ip", (req, res) => {
   if (matcher.contains(ipPengunjung)) {
     res.status(200).json({
       status: "200",
-      developer: "@renkie",
+      developer: "@li zhuanxie",
       ip: ipPengunjung,
       message: 'Authorized'
     });
   } else {
     res.status(403).json({
       status: "403",
-      developer: "@Renkie",
+      developer: "@li zhuanxie",
       ip: ipPengunjung,
       message: 'Not authorized' 
     });
