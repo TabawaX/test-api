@@ -88,7 +88,7 @@ async function pinterest(query) {
 router.post('/zerochan', async (req, res) => {
     const { apiKey, query, pages } = req.body;
 
-    if (!apiKey || apiKey !== validApiKey) {
+    if (!apiKey || apiKey !== apikeyAuth) {
         return res.status(logsekai.noapikey).json(logsekai.noapikey);
     }
     if (!query) {
