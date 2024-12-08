@@ -2,11 +2,13 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 class ZerochanScraper {
-    constructor(query) {
+    constructor(query, pages) {
         this.query = query;
+        this.pages = pages;  // Array berisi halaman yang ingin di-scrape
         this.baseUrl = 'https://www.zerochan.net';
     }
 
+    // Fungsi untuk mengambil HTML dari URL
     async fetchHtml(url) {
         try {
             const { data } = await axios.get(url);
@@ -17,9 +19,20 @@ class ZerochanScraper {
         }
     }
 
-    async getAllImagesFromSearch() {
-        const searchUrl = `${this.baseUrl}/search?q=${encodeURIComponent(this.query)}`;
-        const $ = await this.fetchHtml(searchUrl);
+    // Fungsi untuk mengambil gambar berdasarkan halaman
+    async getAllImagesFromSearch(page) {
+        const searchUrl = `${this.baseUrl}/search?q=${encodeURIComponent(this.query)}&p=${page}`;
+        const { data } = await axios.get(searchUrl);
+
+        // Cek apakah responnya mengandung pesan error (halaman terlalu tinggi)
+        if (data.includes('Page number too high')) {
+            return {
+                status: false,
+                message: 'Too many pages'
+            };
+        }
+
+        const $ = cheerio.load(data);
 
         const images = [];
         $('#thumbs2 li').each((_, element) => {
@@ -32,9 +45,10 @@ class ZerochanScraper {
             }
         });
 
-        return images;
+        return { status: true, images };
     }
 
+    // Fungsi untuk mengambil detail gambar
     async getImageDetails(imageId) {
         const detailUrl = `${this.baseUrl}/${imageId}`;
         const $ = await this.fetchHtml(detailUrl);
@@ -62,17 +76,43 @@ class ZerochanScraper {
         };
     }
 
+    // Fungsi utama untuk scrape semua halaman dan detail gambar
     async scrapeAllDetails() {
-        const images = await this.getAllImagesFromSearch();
+        const images = [];
+
+        // Mengambil gambar dari beberapa halaman sesuai dengan input yang diberikan
+        for (let page of this.pages) {
+            console.log(`Memuat halaman ${page}`);
+            const result = await this.getAllImagesFromSearch(page);
+
+            if (!result.status) {
+                console.log(result.message); // Jika halaman terlalu tinggi
+                return {
+                    status: 'failed',
+                    developer: '@Li Zhuanxie',
+                    message: result.message,
+                    data: [],
+                };
+            }
+
+            if (result.images.length === 0) {
+                console.log(`Tidak ada gambar di halaman ${page}`);
+                continue;
+            }
+
+            images.push(...result.images);
+        }
+
         if (images.length === 0) {
             console.log('Tidak ada gambar yang ditemukan.');
             return {
                 status: 'failed',
-                developer: 'Li Zhuanxie',
+                developer: '@Li Zhuanxie',
                 data: [],
             };
         }
 
+        // Mengambil detail dari setiap gambar yang ditemukan
         const details = await Promise.all(
             images.map(async (image) => {
                 const imageDetails = await this.getImageDetails(image.id);
@@ -85,7 +125,7 @@ class ZerochanScraper {
 
         return {
             status: 'success',
-            developer: 'Li Zhuanxie',
+            developer: '@Li Zhuanxie',
             data: details,
         };
     }
