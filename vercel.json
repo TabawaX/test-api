@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "functions": {
+    "api/edge-function.js": {
+      "runtime": "edge"
+    }
+  },
   "builds": [
     {
       "src": "index.js",
@@ -7,6 +12,7 @@
     }
   ],
   "routes": [
+    { "src": "/api/edge-function", "dest": "api/edge-function.js" },
     { "src": "/api/(.*)", "dest": "index.js" },
     { "src": "/api-docs", "dest": "index.js" },
     { "src": "/docs", "dest": "index.js" },
