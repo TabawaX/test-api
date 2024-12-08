@@ -11,7 +11,11 @@ class ZerochanScraper {
     // Fungsi untuk mengambil HTML dari URL
     async fetchHtml(url) {
         try {
-            const { data } = await axios.get(url);
+            const { data } = await axios.get(url, {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                }
+            });
             return cheerio.load(data);
         } catch (error) {
             console.error(`Gagal memuat halaman: ${url}`, error);
@@ -22,7 +26,11 @@ class ZerochanScraper {
     // Fungsi untuk mengambil gambar berdasarkan halaman
     async getAllImagesFromSearch(page) {
         const searchUrl = `${this.baseUrl}/search?q=${encodeURIComponent(this.query)}&p=${page}`;
-        const { data } = await axios.get(searchUrl);
+        const { data } = await axios.get(searchUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+        });
 
         // Cek apakah responnya mengandung pesan error (halaman terlalu tinggi)
         if (data.includes('Page number too high')) {
