@@ -47,6 +47,14 @@ app.get('/grup', (req, res) => {
   res.redirect('https://chat.whatsapp.com/GsOvT5Jyb4q7ewkuC5Lu5b');
 });
 
+app.get('/ch-anime', (req, res) => {
+  res.redirect('https://whatsapp.com/channel/0029Vat2zJoFHWptU0BnRt03');
+});
+
+app.get('/ch-produksi', (req, res) => {
+  res.redirect('https://whatsapp.com/channel/0029VaUxx567T8beSXPxZk25');
+});
+
 app.get('/telegram', (req, res) => {
   res.redirect('https://t.me/nusantaku');
 });
